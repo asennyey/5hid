@@ -16,26 +16,26 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
-    args: ['-c', 'docker pull gcr.io/${PROJECT_ID}/${IMAGE_NAME}:latest || exit 0']
+    args: ['-c', 'docker pull gcr.io/[PROJECT_ID]/[IMAGE_NAME]:latest || exit 0']
 
   - id: "build image"
     name: "gcr.io/cloud-builders/docker"
-    args: ["build", "-t", "gcr.io/${PROJECT_ID}/${_SERVICE_NAME}", "."]
+    args: ["build", "-t", "gcr.io/[PROJECT_ID]/[_SERVICE_NAME]", "."]
 
   - id: "push image"
     name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/${PROJECT_ID}/${_SERVICE_NAME}"]
+    args: ["push", "gcr.io/[PROJECT_ID]/[_SERVICE_NAME]"]
 
   - id: "apply migrations"
     name: "gcr.io/google-appengine/exec-wrapper"
     args:
       [
         "-i",
-        "gcr.io/$PROJECT_ID/${_SERVICE_NAME}",
+        "gcr.io/$PROJECT_ID/[_SERVICE_NAME]",
         "-s",
-        "${PROJECT_ID}:${_REGION}:${_INSTANCE_NAME}",
+        "[PROJECT_ID]:[_REGION]:[_INSTANCE_NAME]",
         "-e",
-        "SETTINGS_NAME=${_SECRET_SETTINGS_NAME}",
+        "SETTINGS_NAME=[_SECRET_SETTINGS_NAME]",
         "--",
         "python",
         "manage.py",
@@ -47,11 +47,11 @@ steps:
     args:
       [
         "-i",
-        "gcr.io/$PROJECT_ID/${_SERVICE_NAME}",
+        "gcr.io/$PROJECT_ID/[_SERVICE_NAME]",
         "-s",
-        "${PROJECT_ID}:${_REGION}:${_INSTANCE_NAME}",
+        "[PROJECT_ID]:[_REGION]:[_INSTANCE_NAME]",
         "-e",
-        "SETTINGS_NAME=${_SECRET_SETTINGS_NAME}",
+        "SETTINGS_NAME=[_SECRET_SETTINGS_NAME]",
         "--",
         "python",
         "manage.py",
@@ -68,5 +68,5 @@ substitutions:
   _SECRET_SETTINGS_NAME: django_settings
 
 images:
-  - "gcr.io/${PROJECT_ID}/${_SERVICE_NAME}"
+  - "gcr.io/[PROJECT_ID]/[_SERVICE_NAME]"
 # [END cloudrun_django_cloudmigrate]
