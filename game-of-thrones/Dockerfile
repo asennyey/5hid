@@ -61,7 +61,13 @@ RUN apt-get update
 RUN apt-get -y upgrade
 RUN apt-get -y install --no-install-recommends make automake gcc g++ subversion
 RUN apt-get -y install binutils libproj-dev gdal-bin
+
+RUN apt-get update && apt-get install -y gnupg dirmngr wget
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt-get -y update
 RUN apt-get -y install postgresql-13, postgresql-13-postgis, postgresql-server-dev-13, python-psycopg2
+
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache /wheels/*

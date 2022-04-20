@@ -7,6 +7,8 @@ from rest_framework.permissions import (
     SAFE_METHODS,
 )
 from django.db.models import Sum
+from django.db.models.functions import Coalesce    
+
 from game_of_thrones.models import Event, User
 
 class AnonNameField(serializers.Field):
@@ -79,8 +81,7 @@ class LeaderboardViewSet(viewsets.GenericViewSet):
     serializer_class=LeaderboardSerializer
 
     def list(self, request):
-        users = User.objects.annotate(overall_score=Sum('event__score')).order_by('overall_score').select_related()
-        print(*users)
+        users = User.objects.annotate(overall_score=Coalesce(Sum('event__score'), 0)).order_by('-overall_score').select_related()
         page = self.paginate_queryset(users)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
