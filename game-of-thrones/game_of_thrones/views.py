@@ -11,9 +11,10 @@ from game_of_thrones.models import Event, User
 
 class AnonNameField(serializers.Field):
     def to_representation(self, value):
-        return f'{value.first_name} {value.last_name}'
+        return f'{value.first_name} {value.last_name[0]}.'
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    name = AnonNameField(source="*")
     class Meta:
         model = User
         fields = [
@@ -66,6 +67,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
 class LeaderboardSerializer(serializers.ModelSerializer):
     overall_score = serializers.IntegerField()
+    name = AnonNameField(source="*")
     class Meta:
         model = User
         fields = ["name", 'overall_score']

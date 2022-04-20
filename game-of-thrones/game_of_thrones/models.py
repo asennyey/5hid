@@ -4,7 +4,8 @@ from game_of_thrones.managers.user import UserManager
 from django.contrib.gis.db.models import GeometryField
 
 class User(AbstractBaseUser):
-    name: CharField = CharField(max_length=200)
+    first_name: CharField = CharField(max_length=200)
+    last_name: CharField = CharField(max_length=200)
     email: EmailField = EmailField(unique=True)
     is_admin: BooleanField = BooleanField(default=False)
     is_active: BooleanField = BooleanField(default=False)
@@ -13,7 +14,7 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
-    REQUIRED_FIELDS = ["name"]
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     @property
     def is_staff(self):
