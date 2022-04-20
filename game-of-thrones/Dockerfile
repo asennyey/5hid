@@ -76,4 +76,4 @@ USER $USER
 
 EXPOSE 8000
 
-ENTRYPOINT gunicorn game_of_thrones.wsgi --bind 0.0.0.0:8000 --timeout 0 --worker-tmp-dir /dev/shm --workers=2 --threads=4
+CMD gunicorn game_of_thrones.wsgi --bind 0.0.0.0:8000 --timeout 0 --worker-tmp-dir /dev/shm --workers=2 --threads=4
