@@ -61,8 +61,6 @@ RUN pip install --no-cache /wheels/*
 # copy project
 COPY . $APP_HOME
 
-RUN python manage.py collectstatic --no-input
-
 # chown all the files to the app user
 RUN chown -R $USER:$GROUP $APP_HOME
 RUN chown -R $USER:$GROUP $LOG_DIR
@@ -72,4 +70,4 @@ USER $USER
 
 EXPOSE 8000
 
-ENTRYPOINT gunicorn tutor_center.wsgi --bind 0.0.0.0:8000 --worker-tmp-dir /dev/shm --workers=2 --threads=4
+ENTRYPOINT gunicorn tutor_center.wsgi --bind 0.0.0.0:8000 --timeout 0 --worker-tmp-dir /dev/shm --workers=2 --threads=4
