@@ -12,6 +12,9 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+RUN apk update
+RUN apk add make automake gcc g++ subversion
+
 # install psycopg2 dependencies
 RUN apk update \
     && apk add postgresql-dev gcc python3-dev musl-dev \
@@ -50,6 +53,7 @@ WORKDIR $APP_HOME
 
 # install dependencies
 RUN apk update && apk add libpq
+RUN apk add make automake gcc g++ subversion python3-dev
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
