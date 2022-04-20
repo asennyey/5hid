@@ -14,6 +14,10 @@
 
 # [START cloudrun_django_cloudmigrate]
 steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args: ['-c', 'docker pull gcr.io/$PROJECT_ID/$IMAGE_NAME:latest || exit 0']
+
   - id: "build image"
     dir: "game-of-thrones"
     name: "gcr.io/cloud-builders/docker"
@@ -65,7 +69,7 @@ timeout:
 
 substitutions:
   _INSTANCE_NAME: django-instance
-  _REGION: us-central1
+  _REGION: us-central-1
   _SERVICE_NAME: polls-service
   _SECRET_SETTINGS_NAME: django-env
 
