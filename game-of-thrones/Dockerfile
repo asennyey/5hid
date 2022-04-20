@@ -36,12 +36,14 @@ FROM python:3.9-slim-buster
 
 ENV USER=app
 ENV GROUP=app
+ENV ID=11111
 
 # create directory for the app user
 RUN mkdir -p /home/app
 
 # create the app user
 RUN addgroup -S $USER && adduser -S $USER -G $GROUP
+RUN groupadd -g ${ID} ${GROUP} && useradd -u ${ID} -g ${GROUP} -s /bin/sh ${USER}
 
 # create the appropriate directories
 ENV HOME=/home/app
