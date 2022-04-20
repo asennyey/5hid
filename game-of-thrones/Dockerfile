@@ -3,7 +3,7 @@
 ###########
 
 # pull official base image
-FROM python:3.9.6-alpine as builder
+FROM python:3.9-slim-buster as builder
 
 # set work directory
 WORKDIR /usr/src/app
@@ -12,13 +12,15 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apk update
-RUN apk add make automake gcc g++ subversion
+# Update the package listing, so we know what package exist:
+RUN apt-get update
+
+# Install security updates:
+RUN apt-get -y upgrade
+RUN apt-get -y install --no-install-recommends make automake gcc g++ subversion
 
 # install psycopg2 dependencies
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev \
-            libffi-dev
+RUN apt-get -y install libpq-dev
 
 # install dependencies
 COPY ./requirements.txt .
@@ -30,7 +32,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 #########
 
 # pull official base image
-FROM python:3.9.6-alpine
+FROM python:3.9-slim-buster
 
 ENV USER=app
 ENV GROUP=app
@@ -51,9 +53,12 @@ RUN mkdir $APP_HOME
 RUN mkdir $APP_HOME/staticfiles
 WORKDIR $APP_HOME
 
-# install dependencies
-RUN apk update && apk add libpq
-RUN apk add make automake gcc g++ subversion python3-dev
+# Update the package listing, so we know what package exist:
+RUN apt-get update
+
+# Install security updates:
+RUN apt-get -y upgrade
+RUN apt-get -y install --no-install-recommends make automake gcc g++ subversion
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
