@@ -17,7 +17,7 @@ steps:
   - id: "Pull old versions for caching"
     name: 'gcr.io/cloud-builders/docker'
     dir: "game-of-thrones"
-    args: ['pull', 'gcr.io/${PROJECT_ID}/${IMAGE_NAME}:latest']
+    args: ['pull', 'gcr.io/${PROJECT_ID}/${_SERVICE_NAME}:latest']
 
   - id: "build image"
     dir: "game-of-thrones"
