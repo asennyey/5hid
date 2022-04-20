@@ -61,7 +61,7 @@ RUN apt-get update
 RUN apt-get -y upgrade
 RUN apt-get -y install --no-install-recommends make automake gcc g++ subversion
 RUN apt-get -y install binutils libproj-dev gdal-bin
-RUN apt-get -y install postgresql-13.5, postgresql-13.5-postgis, postgresql-server-dev-13.5, python-psycopg2
+RUN apt-get -y install postgresql-13, postgresql-13-postgis, postgresql-server-dev-13, python-psycopg2
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
