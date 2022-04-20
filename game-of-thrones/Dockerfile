@@ -42,7 +42,6 @@ ENV ID=11111
 RUN mkdir -p /home/app
 
 # create the app user
-RUN addgroup -S $USER && adduser -S $USER -G $GROUP
 RUN groupadd -g ${ID} ${GROUP} && useradd -u ${ID} -g ${GROUP} -s /bin/sh ${USER}
 
 # create the appropriate directories
