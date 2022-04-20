@@ -65,6 +65,13 @@ steps:
         "2",
         "--no-input",
       ]
+
+  # Deploy container image to Cloud Run
+  - id: "Deploy to Cloud Run"
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', '${_CLOUD_RUN_SERVICE_NAME}', '--image', 'gcr.io/${PROJECT_ID}/${_SERVICE_NAME}', '--region', '${_REGION}']
+
 timeout:
   1500s
 
@@ -72,6 +79,7 @@ substitutions:
   _INSTANCE_NAME: shit
   _REGION: us-central1
   _SERVICE_NAME: polls-service
+  _CLOUD_RUN_SERVICE_NAME: api
   _SECRET_SETTINGS_NAME: django-env
 
 images:
