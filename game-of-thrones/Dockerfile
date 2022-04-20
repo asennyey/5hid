@@ -60,6 +60,8 @@ RUN apt-get update
 # Install security updates:
 RUN apt-get -y upgrade
 RUN apt-get -y install --no-install-recommends make automake gcc g++ subversion
+RUN apt-get -y install binutils libproj-dev gdal-bin
+RUN apt-get -y install postgresql-13.0, postgresql-13.0-postgis, postgresql-server-dev-13.0, python-psycopg2
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
