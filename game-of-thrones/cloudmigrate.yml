@@ -69,8 +69,8 @@ timeout:
   1500s
 
 substitutions:
-  _INSTANCE_NAME: django-instance
-  _REGION: us-central-1
+  _INSTANCE_NAME: shit
+  _REGION: us-central1
   _SERVICE_NAME: polls-service
   _SECRET_SETTINGS_NAME: django-env
 

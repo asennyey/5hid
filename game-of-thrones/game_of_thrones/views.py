@@ -66,12 +66,12 @@ class EventViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def leaderboard(self, request):
-        events = Event.objects.values('score').order_by('user').annotate(overall_score=Sum('score')).aggregate()
-        page = self.paginate_queryset(events)
+        users = Event.objects.annotate(overall_score=Sum('score')).order_by('overall_score').select_related('user')
+        page = self.paginate_queryset(users)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(events, many=True)
+        serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
 
