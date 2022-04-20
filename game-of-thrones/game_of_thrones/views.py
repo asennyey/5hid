@@ -81,7 +81,7 @@ class LeaderboardViewSet(viewsets.GenericViewSet):
     serializer_class=LeaderboardSerializer
 
     def list(self, request):
-        users = User.objects.annotate(overall_score=Coalesce(Sum('event__score'), 0)).order_by('-overall_score').select_related()
+        users = User.objects.annotate(overall_score=Coalesce(Sum('event__score'), 0)).filter(overall_score__gt=0).order_by('-overall_score').select_related()
         page = self.paginate_queryset(users)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
