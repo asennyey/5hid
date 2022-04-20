@@ -46,6 +46,7 @@ class EventSerializerRead(serializers.ModelSerializer):
             "created_time",
             "location",
             "description",
+            "score"
         ]
 
 
@@ -56,7 +57,6 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     ordering_fields = ["created_time"]
-    serializer_class=EventSerializer
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -64,9 +64,21 @@ class EventViewSet(viewsets.ModelViewSet):
         else:
             return EventSerializer
 
-    @action(detail=False)
-    def leaderboard(self, request):
-        users = Event.objects.annotate(overall_score=Sum('score')).order_by('overall_score').select_related('user')
+class LeaderboardSerializer(serializers.ModelSerializer):
+    overall_score = serializers.IntegerField()
+    class Meta:
+        model = User
+        fields = ["name", 'overall_score']
+
+class LeaderboardViewSet(viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    ordering_fields = ["created_time"]
+    serializer_class=LeaderboardSerializer
+
+    def list(self, request):
+        users = User.objects.annotate(overall_score=Sum('event__score')).order_by('overall_score').select_related()
+        print(*users)
         page = self.paginate_queryset(users)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -74,4 +86,3 @@ class EventViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
-
