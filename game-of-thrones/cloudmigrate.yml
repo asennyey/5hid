@@ -61,8 +61,8 @@ steps:
         "--no-input",
       ]
 timeout:
-  1200s
-  
+  1500s
+
 substitutions:
   _INSTANCE_NAME: django-instance
   _REGION: us-central1
