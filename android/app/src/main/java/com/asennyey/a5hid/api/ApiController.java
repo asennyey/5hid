@@ -145,7 +145,7 @@ public class ApiController {
         try {
             System.out.println(context.getPackageManager()
                     .getActivityInfo(context.getComponentName(), 0));
-            return "http://10.0.2.2:8000/api";
+            return "https://api-omytizdchq-uc.a.run.app/api";
             /*context.getPackageManager()
                     .getActivityInfo(context.getComponentName(), 0)
                     .metaData.getString("API_URL");*/
