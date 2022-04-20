@@ -11,6 +11,7 @@ import com.asennyey.a5hid.api.json.PagedResponse;
 import com.asennyey.a5hid.api.objects.Event;
 import com.asennyey.a5hid.api.objects.Point;
 import com.asennyey.a5hid.api.objects.User;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -96,9 +97,9 @@ public class ApiController {
                             System.out.println("Group " + i + ": " + matcher.group(i));
                         }
                         if(matcher.groupCount() >= 2) {
-                            Point point = new Point(
-                                    Long.parseLong(matcher.group(1)),
-                                    Long.parseLong(matcher.group(2))
+                            LatLng point = new LatLng(
+                                    Double.parseDouble(matcher.group(1)),
+                                    Double.parseDouble(matcher.group(2))
                             );
                             event.location = point;
                         }else{

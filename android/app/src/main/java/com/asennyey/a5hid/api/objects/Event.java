@@ -1,7 +1,9 @@
 package com.asennyey.a5hid.api.objects;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Event {
-    public Point location;
+    public LatLng location;
     public String description;
     public User user;
 

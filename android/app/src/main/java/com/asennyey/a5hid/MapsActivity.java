@@ -1,10 +1,20 @@
 package com.asennyey.a5hid;
 
+import static com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY;
+
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.asennyey.a5hid.api.ApiController;
+import com.asennyey.a5hid.api.objects.Event;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -12,11 +22,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.asennyey.a5hid.databinding.ActivityMapsBinding;
+import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.android.gms.tasks.Task;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
+    private FusedLocationProviderClient fusedLocationClient;
+
+    // Allows class to cancel the location request if it exits the activity.
+    // Typically, you use one cancellation source per lifecycle.
+    private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        ApiController controller = new ApiController(this);
-        controller.getEvents(
-                (page)->{
-                    System.out.println(page.result.records);
-                },
-                (err)->{
-                    System.out.println(err);
-                }
-        );
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -54,9 +64,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        // Request permission
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+            // Main code
+            Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(
+                    PRIORITY_HIGH_ACCURACY,
+                    cancellationTokenSource.getToken()
+            );
+
+            currentLocationTask.addOnCompleteListener((task) -> {
+                    String result = "";
+
+                    if (task.isSuccessful()) {
+                        // Task completed successfully
+                        Location location = task.getResult();
+                        result = "Location (success): " +
+                                location.getLatitude() +
+                                ", " +
+                                location.getLongitude();
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                new LatLng(
+                                        location.getLatitude(),
+                                        location.getLongitude()
+                                ),
+                                10
+                        ));
+                    } else {
+                        // Task failed with an exception
+                        Exception exception = task.getException();
+                        result = "Exception thrown: " + exception;
+                    }
+            });
+        } else {
+            // TODO: Request fine location permission
+        }
+
+        ApiController controller = new ApiController(this);
+        controller.getEvents(
+                (page)->{
+                    for(Event event: page.result.records) {
+                        mMap.addMarker(new MarkerOptions().position(event.location).title(event.description));
+                    }
+                },
+                (err)->{
+                    System.out.println(err);
+                }
+        );
     }
 }
