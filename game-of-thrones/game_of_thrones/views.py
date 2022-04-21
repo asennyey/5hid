@@ -7,9 +7,65 @@ from rest_framework.permissions import (
     SAFE_METHODS,
 )
 from django.db.models import Sum
-from django.db.models.functions import Coalesce    
+from django.db.models.functions import Coalesce
+from django_filters import FilterSet, CharFilter, Filter
+from django_filters.constants import EMPTY_VALUES
+from django_filters import rest_framework as filters
 
 from game_of_thrones.models import Event, User
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.forms.fields import GeometryCollectionField
+from django.db.models import Prefetch
+
+def get_location_filter_params(query, query_object):
+    if query is not None:
+        query_input = {}
+        if 'latitude' in query and 'longitude' in query:
+            latitude = float(query['latitude'])
+            longitude = float(query['longitude'])
+            if 'distance' in query:
+                pnt = GEOSGeometry(f'POINT({longitude} {latitude})')
+                query_input[f'{query_object}__distance_lte'] = (pnt, float(query['distance']))
+    return query_input
+
+
+def filter_location(query_set, query, query_object):
+    return query_set.filter(
+        **get_location_filter_params(query, query_object)
+    )
+
+
+class LocationFilterBackend(filters.DjangoFilterBackend):
+    def get_filterset_kwargs(self, request, queryset, view):
+        kwargs = super().get_filterset_kwargs(request, queryset, view)
+
+        # merge filterset kwargs provided by view class
+        if hasattr(view, 'get_filterset_kwargs'):
+            kwargs.update(view.get_filterset_kwargs())
+
+        return kwargs
+
+class LocationFilterSet(FilterSet):
+    # This is a gross hack, but the filter only allows a single field.
+    latitude = CharFilter(method='is_close_to')
+    longitude = CharFilter(method='is_close_to')
+    distance = CharFilter(method='is_close_to')
+
+    class Meta:
+        model = Event
+        fields = []
+
+    def __init__(self, *args, query_object=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.query_object = query_object
+
+    def is_close_to(self, queryset, name, value):
+        try:
+            queryset = filter_location(queryset, self.data, self.query_object)
+        except Exception as e:
+            print(e)
+        finally:
+            return queryset
 
 class AnonNameField(serializers.Field):
     def to_representation(self, value):
@@ -60,12 +116,19 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     ordering_fields = ["created_time"]
+    filterset_class = LocationFilterSet
+    filter_backends = [LocationFilterBackend]
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return EventSerializerRead
         else:
             return EventSerializer
+
+    def get_filterset_kwargs(self):
+        return {
+            'query_object':'location'
+        }
 
 class LeaderboardSerializer(serializers.ModelSerializer):
     overall_score = serializers.IntegerField()
@@ -81,7 +144,10 @@ class LeaderboardViewSet(viewsets.GenericViewSet):
     serializer_class=LeaderboardSerializer
 
     def list(self, request):
-        users = User.objects.annotate(overall_score=Coalesce(Sum('event__score'), 0)).filter(overall_score__gt=0).order_by('-overall_score').select_related()
+        queryset = self.get_queryset()
+        users = queryset.filter(**get_location_filter_params(self.request.GET.dict(), 'event__location'))\
+            .annotate(overall_score=Coalesce(Sum('event__score'), 0)).filter(overall_score__gt=0)\
+                .order_by('-overall_score')
         page = self.paginate_queryset(users)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

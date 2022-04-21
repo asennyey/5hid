@@ -1,7 +1,7 @@
 from django.db.models import CharField, EmailField, BooleanField, SET_NULL, DateTimeField, ForeignKey, Model, IntegerField, ImageField
 from django.contrib.auth.base_user import AbstractBaseUser
 from game_of_thrones.managers.user import UserManager
-from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.db.models import PointField
 
 class User(AbstractBaseUser):
     first_name: CharField = CharField(max_length=200)
@@ -45,7 +45,7 @@ class BaseModel(Model):
 
 
 class Event(BaseModel):
-    location: GeometryField = GeometryField()
+    location: PointField = PointField()
     user: ForeignKey = ForeignKey(User, on_delete=SET_NULL, null=True)
     score: IntegerField = IntegerField()
     description: CharField = CharField(max_length=2000)
