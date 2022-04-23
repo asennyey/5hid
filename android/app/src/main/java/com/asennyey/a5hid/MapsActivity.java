@@ -156,8 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             this.STATE = "MAP";
             leaderboardButton.setText("Leaderboard");
-            otherFragment.onDestroy();
-            ft.replace(R.id.fragmentContainerView, mapFragment);
+            ft.replace(R.id.fragmentContainerView, mapFragment, null);
             ft.commit();
         }
     }
