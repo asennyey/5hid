@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -16,7 +17,9 @@ import android.view.View;
 import android.widget.Button;
 
 import com.asennyey.a5hid.api.ApiController;
+import com.asennyey.a5hid.api.AuthenticationController;
 import com.asennyey.a5hid.api.objects.read.Event;
+import com.asennyey.a5hid.viewmodels.EventViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     private LocationController locationController;
+    private AuthenticationController authController;
     public boolean logged_in = false;
     public SupportMapFragment mapFragment;
     public Fragment otherFragment;
@@ -48,6 +52,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public Button settingsButton;
     public Button leaderboardButton;
     public Button helpButton;
+    private boolean flag;
+
+    private EventViewModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +71,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         controller = ApiController.getInstance(this);
+        authController = AuthenticationController.getInstance(this);
+        model = new ViewModelProvider(this).get(EventViewModel.class);
+        model.getEvents().observe(this, events -> {
+            if(mMap != null) {
+                // update UI
+                for (Event event : events) {
+                    mMap.addMarker(new MarkerOptions().position(event.location).title(event.description));
+                }
+            }else {
+                flag = true;
+            }
+        });
         settingsButton = findViewById(R.id.settings_button);
         leaderboardButton = findViewById(R.id.leaderboard_button);
         helpButton = findViewById(R.id.help_button);
@@ -80,6 +99,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        if(flag){
+            flag = false;
+            model.getEvents();
+        }
         mMap = googleMap;
         if(locationController.isLocationEnabled()){
             mMap.setMyLocationEnabled(true);
@@ -94,18 +117,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }else{
             // TODO: request location.
         }
-
-        controller.getEvents(
-                (page)->{
-                    System.out.println(page.result.records);
-                    for(Event event: page.result.records) {
-                        mMap.addMarker(new MarkerOptions().position(event.location).title(event.description));
-                    }
-                },
-                (err)->{
-                    System.out.println(err);
-                }
-        );
     }
 
 
@@ -180,15 +191,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onCreateEventClick(){
         com.asennyey.a5hid.api.objects.write.Event event = new com.asennyey.a5hid.api.objects.write.Event();
         event.description = "test from android";
-        event.location = new LatLng(1, 1);
-        controller.createEvent(
-                event,
-                (res)->{
-                    System.out.println(res);
-                },
-                (err)->{
-                    System.out.println(err);
-                }
-        );
+        locationController.getPreciseLocation(cancellationTokenSource, (location)->{
+            event.location = location.result;
+            controller.createEvent(
+                    event,
+                    (res)->{
+                        System.out.println(res);
+                    },
+                    (err)->{
+                        System.out.println(err);
+                    }
+            );
+        }, (err)->{
+            System.out.println(err.result);
+        });
     }
 }

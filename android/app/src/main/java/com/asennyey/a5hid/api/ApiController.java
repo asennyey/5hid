@@ -134,8 +134,8 @@ public class ApiController {
                         if(matcher.find()) {
                             if (matcher.groupCount() >= 2) {
                                 event.location = new LatLng(
-                                        Double.parseDouble(matcher.group(1)),
-                                        Double.parseDouble(matcher.group(2))
+                                        Double.parseDouble(matcher.group(2)),
+                                        Double.parseDouble(matcher.group(1))
                                 );
                             }
                         }
@@ -299,17 +299,7 @@ public class ApiController {
 
     //TODO: dont hardcode
     private String getApiUrl(){
-        try {
-            System.out.println(context.getPackageManager()
-                    .getActivityInfo(context.getComponentName(), 0));
-            return "https://api-omytizdchq-uc.a.run.app/api";
-            /*context.getPackageManager()
-                    .getActivityInfo(context.getComponentName(), 0)
-                    .metaData.getString("API_URL");*/
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-            return "";
-        }
+        return "https://api-omytizdchq-uc.a.run.app/api";
     }
 
     public static ApiController getInstance(Activity context){
@@ -317,5 +307,9 @@ public class ApiController {
             instance = new ApiController(context);
         }
         return instance;
+    }
+
+    public static ApiController getInstance(){
+        return getInstance(null);
     }
 }
