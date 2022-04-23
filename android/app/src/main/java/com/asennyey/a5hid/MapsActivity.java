@@ -164,9 +164,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             leaderboardButton.setText("Return");
             //mapFragment.getView().setVisibility(View.INVISIBLE);
             otherFragment = new Leaderboard();
-            //someFragment.setContainerActivity(this);
-            //someFragment.setArguments(args);
-            ft.replace(R.id.fragmentContainerView, new Leaderboard());
+            //otherFragment.setContainerActivity(this);
+            //otherFragment.setArguments(args);
+            ft.replace(R.id.fragmentContainerView, Leaderboard.class, null);
             ft.commit();
         } else {
             this.STATE = "MAP";
