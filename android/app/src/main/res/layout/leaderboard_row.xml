@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/building"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text=""
+        android:layout_weight="@integer/material_motion_duration_short_1"
+        android:textSize="12pt" />
+    <TextView
+        android:id="@+id/person"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text=""
+        android:layout_weight="@integer/material_motion_duration_short_1"
+        android:textSize="12pt" />
+    <TextView
+        android:id="@+id/shits"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text=""
+        android:layout_weight="@integer/material_motion_duration_short_1"
+        android:textSize="12pt" />
+</LinearLayout>

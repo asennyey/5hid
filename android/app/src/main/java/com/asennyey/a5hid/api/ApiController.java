@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//
 public class ApiController {
     HttpClient client = HttpClient.getInstance();
     AuthenticationController auth;
@@ -35,6 +36,7 @@ public class ApiController {
         context.getMainExecutor().execute(callback);
     }
 
+    //
     public void getEvents(Callback<PagedResponse<Event>> onSuccess, Callback<Exception> onError){
         JsonHelper<Event> helper = new JsonHelper<>();
         try {
@@ -74,6 +76,7 @@ public class ApiController {
         }
     }
 
+    //reads each json response and parses it
     private Event readEvent(JsonReader reader){
         Event event = new Event();
         try {
@@ -82,7 +85,7 @@ public class ApiController {
                     case "description":
                         event.description = reader.nextString();
                         break;
-                    case "location":
+                    case "location": // regex for lat, long, makes latlong obj for google map
                         String geoData = reader.nextString();
                         Matcher matcher = pattern.matcher(geoData);
                         if(matcher.find()) {
@@ -225,6 +228,7 @@ public class ApiController {
         }
     }
 
+    //TODO: dont hardcode
     private String getApiUrl(){
         try {
             System.out.println(context.getPackageManager()

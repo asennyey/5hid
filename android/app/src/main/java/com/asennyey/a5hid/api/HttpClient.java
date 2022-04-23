@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+//holds values from stream in apicontroller
 abstract class HttpClientResponse{
     InputStream stream;
     int statusCode;
@@ -20,6 +21,7 @@ abstract class HttpClientResponse{
     }
 }
 
+// singleton,
 public class HttpClient {
     static HttpClient instance = null;
     Executor executor = Executors.newFixedThreadPool(4);
@@ -50,6 +52,7 @@ public class HttpClient {
         return connection;
     }
 
+    // pass in url, pass in 2 callbacks,
     public void get(URL url, Callback<HttpSuccessResponse> onSuccess, Callback<HttpErrorResponse> onError){
         executor.execute(()-> {
             HttpURLConnection urlConnection = null;
@@ -68,13 +71,14 @@ public class HttpClient {
         });
     }
 
+    // url, data in strified json,
     public void post(URL url, String data, Callback<HttpSuccessResponse> onSuccess, Callback<HttpErrorResponse> onError){
         executor.execute(()-> {
             HttpURLConnection urlConnection = null;
             try {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setDoOutput(true);
-                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setRequestProperty("Content-Type", "application/json"); // set content type
                 urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.connect();
