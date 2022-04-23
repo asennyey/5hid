@@ -3,13 +3,17 @@ package com.asennyey.a5hid;
 import static com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY;
 
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.asennyey.a5hid.api.ApiController;
 import com.asennyey.a5hid.api.objects.Event;
@@ -35,6 +39,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Typically, you use one cancellation source per lifecycle.
     private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
+    public boolean logged_in = false;
+    public SupportMapFragment mapFragment;
+    public Fragment otherFragment;
+    public String STATE = "MAP";
+
+    public Button settingsButton;
+    public Button leaderboardButton;
+    public Button helpButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +58,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        settingsButton = findViewById(R.id.settings_button);
+        leaderboardButton = findViewById(R.id.leaderboard_button);
+        helpButton = findViewById(R.id.help_button);
     }
 
     /**
@@ -91,7 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         location.getLatitude(),
                                         location.getLongitude()
                                 ),
-                                10
+                                18
                         ));
                     } else {
                         // Task failed with an exception
@@ -115,4 +131,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
         );
     }
+
+    public void onToSettings(View v) {
+        FragmentTransaction ft =
+                getSupportFragmentManager().beginTransaction();
+
+        if (STATE.equals("MAP")) {
+            this.STATE = "SETTINGS";
+            settingsButton.setText("Return");
+            //mapFragment.onPause();
+            //mapFragment.getView().setVisibility(View.INVISIBLE);
+            otherFragment = new Settings();
+            //someFragment.setContainerActivity(this);
+            //someFragment.setArguments(args);
+            ft.replace(R.id.fragmentContainerView, new Settings());
+            ft.commit();
+        } else {
+            this.STATE = "MAP";
+            settingsButton.setText("Settings");
+            otherFragment.onDestroy();
+            ft.replace(R.id.fragmentContainerView, mapFragment);
+            ft.commit();
+        }
+    }
+    public void onToLeaderboard(View v) {
+
+    }
+    public void onToHelp(View v) {
+
+    }
+
+    // button will be within maps fragment
+    public void onNewEvent(View V) {
+
+    }
+    //TODO: implement login/credentials feature
+
+    //TODO: implment create_event_page
 }
