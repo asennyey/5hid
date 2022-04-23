@@ -59,7 +59,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -134,6 +134,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         );
     }
 
+
     public void onToSettings(View v) {
         FragmentTransaction ft =
                 getSupportFragmentManager().beginTransaction();
@@ -187,4 +188,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //TODO: implement login/credentials feature
 
     //TODO: implment create_event_page
+
+    public void onLoginClick(){
+        com.asennyey.a5hid.api.objects.write.User user = new com.asennyey.a5hid.api.objects.write.User();
+        user.username = "asennyey@email.arizona.edu";
+        user.password = "Araclasen6893.";
+        controller.login(
+                user,
+                (res)->{
+                    System.out.println(res);
+                },
+                (err)->{
+                    System.out.println(err);
+                }
+        );
+    }
+
+    public void onCreateEventClick(){
+        com.asennyey.a5hid.api.objects.write.Event event = new com.asennyey.a5hid.api.objects.write.Event();
+        event.description = "test from android";
+        event.location = new LatLng(1, 1);
+        controller.createEvent(
+                event,
+                (res)->{
+                    System.out.println(res);
+                },
+                (err)->{
+                    System.out.println(err);
+                }
+        );
+    }
 }

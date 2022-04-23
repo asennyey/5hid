@@ -1,5 +1,7 @@
 package com.asennyey.a5hid.api;
 
+import com.asennyey.a5hid.api.objects.read.Jwt;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -47,17 +49,20 @@ public class HttpClient {
         }
     }
 
-    private HttpURLConnection openConnection(URL url) throws IOException {
+    private HttpURLConnection openConnection(URL url, Jwt jwt) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        if(jwt != null){
+            connection.setRequestProperty("Authorization", String.format("Bearer JWT %s", jwt.accessToken));
+        }
         return connection;
     }
 
     // pass in url, pass in 2 callbacks,
-    public void get(URL url, Callback<HttpSuccessResponse> onSuccess, Callback<HttpErrorResponse> onError){
+    public void get(URL url, Jwt jwt, Callback<HttpSuccessResponse> onSuccess, Callback<HttpErrorResponse> onError){
         executor.execute(()-> {
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = openConnection(url);
+                urlConnection = openConnection(url, jwt);
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoInput(true);
                 HttpClientResponse res = handleHttpResponse(urlConnection);
@@ -71,12 +76,21 @@ public class HttpClient {
         });
     }
 
+    // pass in url, pass in 2 callbacks,
+    public void get(URL url, Callback<HttpSuccessResponse> onSuccess, Callback<HttpErrorResponse> onError){
+        this.get(url, null, onSuccess, onError);
+    }
+
     // url, data in strified json,
     public void post(URL url, String data, Callback<HttpSuccessResponse> onSuccess, Callback<HttpErrorResponse> onError){
+        this.post(url, data, null, onSuccess, onError);
+    }
+
+    public void post(URL url, String data, Jwt jwt, Callback<HttpSuccessResponse> onSuccess, Callback<HttpErrorResponse> onError) {
         executor.execute(()-> {
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection = openConnection(url, jwt);
                 urlConnection.setDoOutput(true);
                 urlConnection.setRequestProperty("Content-Type", "application/json"); // set content type
                 urlConnection.setRequestProperty("Accept", "application/json");
@@ -101,7 +115,7 @@ public class HttpClient {
         });
     }
 
-    public static HttpClient getInstance(){
+        public static HttpClient getInstance(){
         if(HttpClient.instance == null){
             HttpClient.instance = new HttpClient();
         }

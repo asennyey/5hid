@@ -137,6 +137,7 @@ public class ApiController {
             client.post(
                     new URL(getApiUrl() + "/auth/jwt/create/"),
                     user.toString(),
+                    auth.getJwt(),
                     (res)->{
                         JsonReader reader = null;
                         try {
@@ -201,6 +202,7 @@ public class ApiController {
             client.post(
                     new URL(getApiUrl() + "/events/"),
                     event.toString(),
+                    auth.getJwt(),
                     (res)->{
                         runOnMainThread(()->onSuccess.onResult(new Result<>(true)));
                     },
