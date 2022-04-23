@@ -33,13 +33,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
-    private FusedLocationProviderClient fusedLocationClient;
     private ApiController controller;
 
     // Allows class to cancel the location request if it exits the activity.
     // Typically, you use one cancellation source per lifecycle.
     private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
+    private LocationController locationController;
     public boolean logged_in = false;
     public SupportMapFragment mapFragment;
     public Fragment otherFragment;
@@ -56,14 +56,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        locationController = LocationController.getInstance(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        controller = new ApiController(this);
+        controller = ApiController.getInstance(this);
         settingsButton = findViewById(R.id.settings_button);
         leaderboardButton = findViewById(R.id.leaderboard_button);
         helpButton = findViewById(R.id.help_button);
@@ -81,44 +81,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Request permission
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) {
+        if(locationController.isLocationEnabled()){
             mMap.setMyLocationEnabled(true);
-            // Main code
-            Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(
-                    PRIORITY_HIGH_ACCURACY,
-                    cancellationTokenSource.getToken()
-            );
+            locationController.getPreciseLocation(cancellationTokenSource, (location)->{
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        location.result,
+                        1
+                ));
+            }, (err)->{
 
-            currentLocationTask.addOnCompleteListener((task) -> {
-                    String result = "";
-
-                    if (task.isSuccessful()) {
-                        // Task completed successfully
-                        Location location = task.getResult();
-                        result = "Location (success): " +
-                                location.getLatitude() +
-                                ", " +
-                                location.getLongitude();
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                new LatLng(
-                                        location.getLatitude(),
-                                        location.getLongitude()
-                                ),
-                                5
-                        ));
-                    } else {
-                        // Task failed with an exception
-                        Exception exception = task.getException();
-                        result = "Exception thrown: " + exception;
-                    }
             });
-        } else {
-            // TODO: Request fine location permission
+        }else{
+            // TODO: request location.
         }
 
         controller.getEvents(
@@ -164,10 +138,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             this.STATE = "LEADER";
             leaderboardButton.setText("Return");
             //mapFragment.getView().setVisibility(View.INVISIBLE);
-            otherFragment = new Leaderboard();
             //otherFragment.setContainerActivity(this);
             //otherFragment.setArguments(args);
-            ft.replace(R.id.fragmentContainerView, Leaderboard.class, null);
+            ft.replace(R.id.fragmentContainerView, leaderboard_list_fragment.class, null);
             ft.commit();
         } else {
             this.STATE = "MAP";

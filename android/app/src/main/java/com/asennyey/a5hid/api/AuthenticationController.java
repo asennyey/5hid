@@ -32,6 +32,10 @@ public class AuthenticationController {
         editor.apply();
     }
 
+    public void logout(){
+        this.setJwt(new Jwt());
+    }
+
     private SharedPreferences getSharedPreferences(){
         return this.context.getSharedPreferences("auth-prefs", 0);
     }

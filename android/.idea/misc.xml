@@ -3,12 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/activity_maps.xml" value="0.176" />
-        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/fragment_leaderboard.xml" value="0.136" />
-        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/fragment_leaderboard_list_fragment.xml" value="0.13385416666666666" />
-        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/fragment_leaderboard_list_fragment_list.xml" value="0.13385416666666666" />
-        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/fragment_settings.xml" value="0.16" />
-        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/leaderboard_row.xml" value="0.11614583333333334" />
+        <entry key="app/src/main/res/layout/fragment_leaderboard.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_leaderboard_list_fragment.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_leaderboard_list_fragment_list.xml" value="0.1" />
       </map>
     </option>
   </component>

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.asennyey.a5hid.api.objects.read.LeaderboardUser;
 import com.asennyey.a5hid.placeholder.PlaceholderContent.PlaceholderItem;
 import com.asennyey.a5hid.databinding.FragmentLeaderboardListFragmentBinding;
 
@@ -18,13 +19,9 @@ import java.util.List;
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+    private final List<LeaderboardUser> mValues;
 
-    private ArrayList<String> names;
-    private ArrayList<String> buildings;
-    private ArrayList<Integer> shits;
-    private final List<PlaceholderItem> mValues;
-
-    public MyItemRecyclerViewAdapter(List<PlaceholderItem> items) {
+    public MyItemRecyclerViewAdapter(List<LeaderboardUser> items) {
         mValues = items;
     }
 
@@ -38,8 +35,8 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mIdView.setText(mValues.get(position).name);
+        holder.mContentView.setText(""+mValues.get(position).score);
     }
 
     @Override
@@ -50,7 +47,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mIdView;
         public final TextView mContentView;
-        public PlaceholderItem mItem;
+        public LeaderboardUser mItem;
 
         public ViewHolder(FragmentLeaderboardListFragmentBinding binding) {
             super(binding.getRoot());

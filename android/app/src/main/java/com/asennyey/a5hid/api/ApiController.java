@@ -1,6 +1,7 @@
 package com.asennyey.a5hid.api;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.JsonReader;
 
@@ -10,6 +11,7 @@ import com.asennyey.a5hid.api.objects.read.Event;
 import com.asennyey.a5hid.api.objects.read.Jwt;
 import com.asennyey.a5hid.api.objects.read.LeaderboardUser;
 import com.asennyey.a5hid.api.objects.read.User;
+import com.google.android.gms.common.api.Api;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.BufferedReader;
@@ -22,6 +24,7 @@ import java.util.regex.Pattern;
 
 //
 public class ApiController {
+    private static ApiController instance;
     HttpClient client = HttpClient.getInstance();
     AuthenticationController auth;
     Activity context;
@@ -307,5 +310,12 @@ public class ApiController {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static ApiController getInstance(Activity context){
+        if(instance == null){
+            instance = new ApiController(context);
+        }
+        return instance;
     }
 }

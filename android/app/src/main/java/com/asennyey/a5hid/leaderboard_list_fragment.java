@@ -12,9 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.asennyey.a5hid.api.ApiController;
+import com.asennyey.a5hid.api.objects.read.LeaderboardUser;
 import com.asennyey.a5hid.placeholder.PlaceholderContent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -22,13 +25,11 @@ import java.util.ArrayList;
 public class leaderboard_list_fragment extends Fragment {
 
     // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_LEADERBOARD = "leaderboard";
     // TODO: Customize parameters
-    private int mColumnCount = 1;
-
-    private ArrayList<String> people;
-    private ArrayList<String> buildings;
-    private ArrayList<Integer> shits;
+    private List<LeaderboardUser> users = new ArrayList<>();
+    private ApiController api = ApiController.getInstance(null);
+    private MyItemRecyclerViewAdapter adapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -39,10 +40,9 @@ public class leaderboard_list_fragment extends Fragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static leaderboard_list_fragment newInstance(int columnCount) {
+    public static leaderboard_list_fragment newInstance(List<LeaderboardUser> users) {
         leaderboard_list_fragment fragment = new leaderboard_list_fragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,10 +50,14 @@ public class leaderboard_list_fragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        api.getLeaderboard((page)->{
+            adapter.notifyItemRangeRemoved(0, users.size());
+            users.clear();
+            users.addAll(page.result.records);
+            adapter.notifyItemRangeInserted(0, page.result.records.size());
+        }, (err)->{
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
+        });
     }
 
     @Override
@@ -65,12 +69,9 @@ public class leaderboard_list_fragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(PlaceholderContent.ITEMS));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            adapter = new MyItemRecyclerViewAdapter(users);
+            recyclerView.setAdapter(adapter);
         }
         return view;
     }
