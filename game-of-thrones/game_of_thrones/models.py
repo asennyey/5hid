@@ -1,10 +1,11 @@
 from django.db.models import CharField, EmailField, BooleanField, SET_NULL, DateTimeField, ForeignKey, Model, IntegerField, ImageField
 from django.contrib.auth.base_user import AbstractBaseUser
 from game_of_thrones.managers.user import UserManager
-from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.db.models import PointField
 
 class User(AbstractBaseUser):
-    name: CharField = CharField(max_length=200)
+    first_name: CharField = CharField(max_length=200)
+    last_name: CharField = CharField(max_length=200)
     email: EmailField = EmailField(unique=True)
     is_admin: BooleanField = BooleanField(default=False)
     is_active: BooleanField = BooleanField(default=False)
@@ -13,7 +14,7 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
-    REQUIRED_FIELDS = ["name"]
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     @property
     def is_staff(self):
@@ -44,7 +45,7 @@ class BaseModel(Model):
 
 
 class Event(BaseModel):
-    location: GeometryField = GeometryField()
+    location: PointField = PointField()
     user: ForeignKey = ForeignKey(User, on_delete=SET_NULL, null=True)
     score: IntegerField = IntegerField()
     description: CharField = CharField(max_length=2000)

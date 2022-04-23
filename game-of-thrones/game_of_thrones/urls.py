@@ -19,11 +19,12 @@ from rest_framework import routers
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from game_of_thrones.views import EventViewSet
+from game_of_thrones.views import EventViewSet, LeaderboardViewSet
 
 
 router = routers.SimpleRouter()
 router.register(r"events", EventViewSet)
+router.register(r"leaderboard", LeaderboardViewSet)
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -60,5 +61,5 @@ urlpatterns += [
     path('admin/', admin.site.urls),
     path("api/auth/", include("djoser.urls")),
     path("api/auth/", include("djoser.urls.jwt")),
-    path("api/", include((router.urls, "tutor_center"))),
+    path("api/", include((router.urls, "game_of_thrones"))),
 ]

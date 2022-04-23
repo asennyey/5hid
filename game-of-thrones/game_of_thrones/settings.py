@@ -13,19 +13,59 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 from typing import List
-import environ, os
+import environ, os, io
+
+from urllib.parse import urlparse
+import google.auth
+from google.cloud import secretmanager
 
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
     interpolate=True,
 )
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env_file = os.path.join(BASE_DIR, ".env")
+
 # Take environment variables from .env file
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+environ.Env.read_env(env_file)
+
+# Attempt to load the Project ID into the environment, safely failing on error.
+try:
+    print(*google.auth.default())
+    _, os.environ["GOOGLE_CLOUD_PROJECT"] = google.auth.default()
+except google.auth.exceptions.DefaultCredentialsError:
+    pass
+
+if os.path.isfile(env_file):
+    # Use a local secret file, if provided
+
+    env.read_env(env_file)
+# [START_EXCLUDE]
+elif os.getenv("TRAMPOLINE_CI", None):
+    # Create local settings if running with CI, for unit testing
+
+    placeholder = (
+        f"SECRET_KEY=a\n"
+        "GS_BUCKET_NAME=None\n"
+        f"DATABASE_URL=sqlite://{os.path.join(BASE_DIR, 'db.sqlite3')}"
+    )
+    env.read_env(io.StringIO(placeholder))
+# [END_EXCLUDE]
+elif os.environ.get("GOOGLE_CLOUD_PROJECT", None):
+    # Pull secrets from Secret Manager
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+
+    client = secretmanager.SecretManagerServiceClient()
+    settings_name = os.environ.get("SETTINGS_NAME", "django-env")
+    name = f"projects/{project_id}/secrets/{settings_name}/versions/latest"
+    payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
+
+    env.read_env(io.StringIO(payload))
+else:
+    raise Exception("No local .env or GOOGLE_CLOUD_PROJECT detected. No secrets found.")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -36,7 +76,18 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS: List[str] = ["10.0.2.2", "127.0.0.1", "localhost"]
+# [START cloudrun_django_csrf]
+# SECURITY WARNING: It's recommended that you use this when
+# running in production. The URL will be known once you first deploy
+# to Cloud Run. This code takes the URL and converts it to both these settings formats.
+CLOUDRUN_SERVICE_URL = env("CLOUDRUN_SERVICE_URL", default=None)
+if CLOUDRUN_SERVICE_URL:
+    ALLOWED_HOSTS = [urlparse(CLOUDRUN_SERVICE_URL).netloc]
+    CSRF_TRUSTED_ORIGINS = [CLOUDRUN_SERVICE_URL]
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+else:
+    ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -91,12 +142,12 @@ WSGI_APPLICATION = 'game_of_thrones.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASES = {"default": env.db()}
+
+# If the flag as been set, configure to use proxy
+if env("USE_CLOUD_SQL_AUTH_PROXY", default=None):
+    DATABASES["default"]["HOST"] = "127.0.0.1"
+    DATABASES["default"]["PORT"] = 5432
 
 
 # Password validation
@@ -129,18 +180,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATIC_URL = "/api/static/"
-
-# Extra places for collectstatic to find static files.
-STATICFILES_DIRS = ()
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Default primary key field type
@@ -159,11 +198,6 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.OrderingFilter",
     ],
-    # "DEFAULT_THROTTLE_CLASSES": [
-    #     "tutor_center.throttling.OpenHoursThrottle",
-    #     "rest_framework.throttling.AnonRateThrottle",
-    #     "rest_framework.throttling.UserRateThrottle",
-    # ],
     "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 100,
@@ -183,7 +217,15 @@ SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,
 }
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# Static files (CSS, JavaScript, Images)
+# [START cloudrun_django_static_config]
+# Define static storage via django-storages[google]
+GS_BUCKET_NAME = env("GS_BUCKET_NAME")
+STATIC_URL = "/static/"
+DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+GS_DEFAULT_ACL = "publicRead"
+# [END cloudrun_django_static_config]
 
 AUTH_USER_MODEL = "game_of_thrones.User"
 

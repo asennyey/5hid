@@ -91,22 +91,14 @@ public class ApiController {
                         break;
                     case "location": // regex for lat, long, makes latlong obj for google map
                         String geoData = reader.nextString();
-                        System.out.println(geoData);
                         Matcher matcher = pattern.matcher(geoData);
-                        System.out.println(matcher.find());
-                        System.out.println("Full match: " + matcher.group(0));
-
-                        for (int i = 1; i <= matcher.groupCount(); i++) {
-                            System.out.println("Group " + i + ": " + matcher.group(i));
-                        }
-                        if(matcher.groupCount() >= 2) {
-                            LatLng point = new LatLng(
-                                    Double.parseDouble(matcher.group(1)),
-                                    Double.parseDouble(matcher.group(2))
-                            );
-                            event.location = point;
-                        }else{
-                            reader.skipValue();
+                        if(matcher.find()) {
+                            if (matcher.groupCount() >= 2) {
+                                event.location = new LatLng(
+                                        Double.parseDouble(matcher.group(1)),
+                                        Double.parseDouble(matcher.group(2))
+                                );
+                            }
                         }
                         break;
                     case "user":
@@ -149,7 +141,7 @@ public class ApiController {
         try {
             System.out.println(context.getPackageManager()
                     .getActivityInfo(context.getComponentName(), 0));
-            return "http://10.0.2.2:8000/api";
+            return "https://api-omytizdchq-uc.a.run.app/api";
             /*context.getPackageManager()
                     .getActivityInfo(context.getComponentName(), 0)
                     .metaData.getString("API_URL");*/

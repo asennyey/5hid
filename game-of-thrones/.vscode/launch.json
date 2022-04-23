@@ -13,7 +13,41 @@
                 "runserver"
             ],
             "env": {
-                "DEBUG": "true"
+                "DEBUG": "true",
+                "USE_CLOUD_SQL_AUTH_PROXY":"true",
+                "GOOGLE_CLOUD_PROJECT": "csc317-final"
+            },
+            "django": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Django: Make Migrations",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "makemigrations"
+            ],
+            "env": {
+                "DEBUG": "true",
+                "USE_CLOUD_SQL_AUTH_PROXY":"true",
+                "GOOGLE_CLOUD_PROJECT": "csc317-final"
+            },
+            "django": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Django: Migrate",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "migrate"
+            ],
+            "env": {
+                "DEBUG": "true",
+                "USE_CLOUD_SQL_AUTH_PROXY":"true",
+                "GOOGLE_CLOUD_PROJECT": "csc317-final"
             },
             "django": true,
             "justMyCode": true
