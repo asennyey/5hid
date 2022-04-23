@@ -1,38 +1,34 @@
 package com.asennyey.a5hid.api;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
 import android.util.JsonReader;
 
 import com.asennyey.a5hid.api.json.JsonHelper;
 import com.asennyey.a5hid.api.json.PagedResponse;
-import com.asennyey.a5hid.api.objects.Event;
-import com.asennyey.a5hid.api.objects.Point;
-import com.asennyey.a5hid.api.objects.User;
+import com.asennyey.a5hid.api.objects.read.Event;
+import com.asennyey.a5hid.api.objects.read.Jwt;
+import com.asennyey.a5hid.api.objects.read.User;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ApiController {
     HttpClient client = HttpClient.getInstance();
+    AuthenticationController auth;
     Activity context;
     final String regex = "POINT ?\\((-?\\d+\\.\\d+) (-?\\d+\\.\\d+)\\)";
 
     final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
     public ApiController(Activity context){
         this.context = context;
+        auth = AuthenticationController.getInstance(context);
     }
 
     private void runOnMainThread(Runnable callback){
@@ -130,6 +126,102 @@ public class ApiController {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public void login(com.asennyey.a5hid.api.objects.write.User user, Callback<Boolean> onSuccess, Callback<Exception> onError){
+        try {
+            client.post(
+                    new URL(getApiUrl() + "/auth/jwt/create/"),
+                    user.toString(),
+                    (res)->{
+                        JsonReader reader = null;
+                        try {
+                            reader = new JsonReader(new InputStreamReader(res.result.stream,"UTF-8"));
+                            Jwt jwt = readJwt(reader);
+                            auth.setJwt(jwt);
+                            runOnMainThread(()->onSuccess.onResult(new Result<>(true)));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    },
+                    (err)-> {
+                        BufferedReader r = new BufferedReader(new InputStreamReader(err.result.stream));
+                        StringBuilder total = new StringBuilder();
+                        try {
+                            for (String line; (line = r.readLine()) != null; ) {
+                                total.append(line).append('\n');
+                            }
+                            System.out.println(total.toString());
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        runOnMainThread(() -> onError.onResult(
+                                new Result<>(
+                                        new Exception(String.valueOf(err.result.statusCode))
+                                )
+                        ));
+                    });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            runOnMainThread(()->onError.onResult(new Result<>(e)));
+        }
+    }
+
+    private Jwt readJwt(JsonReader reader){
+        Jwt jwt = new Jwt();
+        try {
+            reader.beginObject();
+            while(reader.hasNext()){
+                switch(reader.nextName()){
+                    case "access":
+                        jwt.accessToken = reader.nextString();
+                        break;
+                    case "refresh":
+                        jwt.refreshToken = reader.nextString();
+                        break;
+                    default:
+                        reader.skipValue();
+                }
+            }
+            reader.endObject();
+            return jwt;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void createEvent(com.asennyey.a5hid.api.objects.write.Event event, Callback<Boolean> onSuccess, Callback<Exception> onError){
+        try {
+            client.post(
+                    new URL(getApiUrl() + "/events/"),
+                    event.toString(),
+                    (res)->{
+                        runOnMainThread(()->onSuccess.onResult(new Result<>(true)));
+                    },
+                    (err)-> {
+                        BufferedReader r = new BufferedReader(new InputStreamReader(err.result.stream));
+                        StringBuilder total = new StringBuilder();
+                        try {
+                            for (String line; (line = r.readLine()) != null; ) {
+                                total.append(line).append('\n');
+                            }
+                            System.out.println(total.toString());
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        runOnMainThread(() -> onError.onResult(
+                                new Result<>(
+                                        new Exception(String.valueOf(err.result.statusCode))
+                                )
+                        ));
+                    });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            runOnMainThread(()->onError.onResult(new Result<>(e)));
         }
     }
 

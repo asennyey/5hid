@@ -9,10 +9,9 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.asennyey.a5hid.api.ApiController;
-import com.asennyey.a5hid.api.objects.Event;
+import com.asennyey.a5hid.api.objects.read.Event;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,6 +29,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
     private FusedLocationProviderClient fusedLocationClient;
+    private ApiController controller;
 
     // Allows class to cancel the location request if it exits the activity.
     // Typically, you use one cancellation source per lifecycle.
@@ -49,6 +49,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        controller = new ApiController(this);
+        onLoginClick();
     }
 
     /**
@@ -103,12 +106,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // TODO: Request fine location permission
         }
 
-        ApiController controller = new ApiController(this);
         controller.getEvents(
                 (page)->{
                     for(Event event: page.result.records) {
                         mMap.addMarker(new MarkerOptions().position(event.location).title(event.description));
                     }
+                },
+                (err)->{
+                    System.out.println(err);
+                }
+        );
+    }
+
+    public void onLoginClick(){
+        com.asennyey.a5hid.api.objects.write.User user = new com.asennyey.a5hid.api.objects.write.User();
+        user.username = "asennyey@email.arizona.edu";
+        user.password = "";
+        controller.login(
+                user,
+                (res)->{
+                    System.out.println(res);
+                },
+                (err)->{
+                    System.out.println(err);
+                }
+        );
+    }
+
+    public void onCreateEventClick(){
+        com.asennyey.a5hid.api.objects.write.Event event = new com.asennyey.a5hid.api.objects.write.Event();
+        event.description = "test from android";
+        event.location = new LatLng(1, 1);
+        controller.createEvent(
+                event,
+                (res)->{
+                    System.out.println(res);
                 },
                 (err)->{
                     System.out.println(err);

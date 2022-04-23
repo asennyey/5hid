@@ -1,4 +1,4 @@
-package com.asennyey.a5hid.api.objects;
+package com.asennyey.a5hid.api.objects.read;
 
 public class User {
     public String name;
