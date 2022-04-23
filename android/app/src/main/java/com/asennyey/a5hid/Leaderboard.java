@@ -75,6 +75,14 @@ public class Leaderboard extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_settings, container, false);
+        this.cont = container;
+        this.view = v;
 
         buildings = new ArrayList<String>();
         names = new ArrayList<String>();
@@ -99,18 +107,11 @@ public class Leaderboard extends Fragment {
         int[] to = {R.id.building, R.id.person, R.id.shits};
 
         SimpleAdapter simpleAdapter = new
-                SimpleAdapter(mContext, row, R.layout.leaderboard_row, from, to);
+                SimpleAdapter(v.getContext(), row, R.layout.leaderboard_row, from, to);
 
         listView = (ListView) view.findViewById(R.id.leaderboard_list_view);
         listView.setAdapter(simpleAdapter);
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_settings, container, false);
-        this.cont = container;
-        this.view = v;
         return v;
     }
 }
