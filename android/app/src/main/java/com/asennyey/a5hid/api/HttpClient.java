@@ -1,5 +1,7 @@
 package com.asennyey.a5hid.api;
 
+import static java.net.HttpURLConnection.*;
+
 import com.asennyey.a5hid.api.objects.read.Jwt;
 
 import java.io.BufferedInputStream;
@@ -42,17 +44,17 @@ public class HttpClient {
     private HttpClientResponse handleHttpResponse(HttpURLConnection connection) throws IOException {
         int responseStatusCode = connection.getResponseCode();
         System.out.println(responseStatusCode);
-        if (responseStatusCode != HttpURLConnection.HTTP_OK) {
-            return new HttpErrorResponse(connection.getErrorStream(), responseStatusCode);
-        } else {
+        if(responseStatusCode / 100 == 2){
             return new HttpSuccessResponse(connection.getInputStream(), responseStatusCode);
+        }else{
+            return new HttpErrorResponse(connection.getErrorStream(), responseStatusCode);
         }
     }
 
     private HttpURLConnection openConnection(URL url, Jwt jwt) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if(jwt != null){
-            connection.setRequestProperty("Authorization", String.format("Bearer JWT %s", jwt.accessToken));
+            connection.setRequestProperty("Authorization", String.format("JWT %s", jwt.accessToken));
         }
         return connection;
     }

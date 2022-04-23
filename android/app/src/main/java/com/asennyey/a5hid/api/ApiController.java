@@ -8,6 +8,7 @@ import com.asennyey.a5hid.api.json.JsonHelper;
 import com.asennyey.a5hid.api.json.PagedResponse;
 import com.asennyey.a5hid.api.objects.read.Event;
 import com.asennyey.a5hid.api.objects.read.Jwt;
+import com.asennyey.a5hid.api.objects.read.LeaderboardUser;
 import com.asennyey.a5hid.api.objects.read.User;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -24,7 +25,7 @@ public class ApiController {
     HttpClient client = HttpClient.getInstance();
     AuthenticationController auth;
     Activity context;
-    final String regex = "POINT ?\\((-?\\d+\\.\\d+) (-?\\d+\\.\\d+)\\)";
+    final String regex = "POINT ?\\((-?\\d+\\.?\\d*) (-?\\d+\\.?\\d*)\\)";
 
     final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
     public ApiController(Activity context){
@@ -76,6 +77,45 @@ public class ApiController {
         }
     }
 
+    public void getLeaderboard(Callback<PagedResponse<LeaderboardUser>> onSuccess, Callback<Exception> onError){
+        JsonHelper<LeaderboardUser> helper = new JsonHelper<>();
+        try {
+            client.get(
+                    new URL(getApiUrl() + "/leaderboard"),
+                    (res)->{
+                        JsonReader reader = null;
+                        try {
+                            reader = new JsonReader(new InputStreamReader(res.result.stream,"UTF-8"));
+                            PagedResponse<LeaderboardUser> currentPage = helper.readPage(reader, this::readLeaderboardUser);
+                            runOnMainThread(()->onSuccess.onResult(new Result<>(currentPage)));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    },
+                    (err)-> {
+                        BufferedReader r = new BufferedReader(new InputStreamReader(err.result.stream));
+                        StringBuilder total = new StringBuilder();
+                        try {
+                            for (String line; (line = r.readLine()) != null; ) {
+                                total.append(line).append('\n');
+                            }
+                            System.out.println(total.toString());
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        runOnMainThread(() -> onError.onResult(
+                                new Result<>(
+                                        new Exception(String.valueOf(err.result.statusCode))
+                                )
+                        ));
+                    });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            runOnMainThread(()->onError.onResult(new Result<>(e)));
+        }
+    }
+
     //reads each json response and parses it
     private Event readEvent(JsonReader reader){
         Event event = new Event();
@@ -113,6 +153,28 @@ public class ApiController {
         }
     }
 
+    private LeaderboardUser readLeaderboardUser(JsonReader reader){
+        LeaderboardUser user = new LeaderboardUser();
+        try {
+            while(reader.hasNext()){
+                switch(reader.nextName()){
+                    case "name":
+                        user.name = reader.nextString();
+                        break;
+                    case "overall_score":
+                        user.score = reader.nextInt();
+                        break;
+                    default:
+                        reader.skipValue();
+                }
+            }
+            return user;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private User readUser(JsonReader reader){
         User user = new User();
         try {
@@ -133,6 +195,7 @@ public class ApiController {
     }
 
     public void login(com.asennyey.a5hid.api.objects.write.User user, Callback<Boolean> onSuccess, Callback<Exception> onError){
+        System.out.println(auth.getJwt());
         try {
             client.post(
                     new URL(getApiUrl() + "/auth/jwt/create/"),
@@ -198,6 +261,7 @@ public class ApiController {
     }
 
     public void createEvent(com.asennyey.a5hid.api.objects.write.Event event, Callback<Boolean> onSuccess, Callback<Exception> onError){
+        System.out.println(auth.getJwt());
         try {
             client.post(
                     new URL(getApiUrl() + "/events/"),

@@ -64,7 +64,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         controller = new ApiController(this);
-        onLoginClick();
         settingsButton = findViewById(R.id.settings_button);
         leaderboardButton = findViewById(R.id.leaderboard_button);
         helpButton = findViewById(R.id.help_button);
@@ -110,7 +109,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         location.getLatitude(),
                                         location.getLongitude()
                                 ),
-                                18
+                                5
                         ));
                     } else {
                         // Task failed with an exception
@@ -124,6 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         controller.getEvents(
                 (page)->{
+                    System.out.println(page.result.records);
                     for(Event event: page.result.records) {
                         mMap.addMarker(new MarkerOptions().position(event.location).title(event.description));
                     }
