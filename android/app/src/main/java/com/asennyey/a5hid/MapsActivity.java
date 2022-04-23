@@ -139,7 +139,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (STATE.equals("MAP")) {
             this.STATE = "SETTINGS";
             settingsButton.setText("Return");
-            //mapFragment.onPause();
             //mapFragment.getView().setVisibility(View.INVISIBLE);
             otherFragment = new Settings();
             //someFragment.setContainerActivity(this);
@@ -155,7 +154,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
     public void onToLeaderboard(View v) {
+        FragmentTransaction ft =
+                getSupportFragmentManager().beginTransaction();
 
+        if (STATE.equals("MAP")) {
+            this.STATE = "LEADER";
+            leaderboardButton.setText("Return");
+            //mapFragment.getView().setVisibility(View.INVISIBLE);
+            otherFragment = new Leaderboard();
+            //someFragment.setContainerActivity(this);
+            //someFragment.setArguments(args);
+            ft.replace(R.id.fragmentContainerView, new Leaderboard());
+            ft.commit();
+        } else {
+            this.STATE = "MAP";
+            leaderboardButton.setText("Leaderboard");
+            otherFragment.onDestroy();
+            ft.replace(R.id.fragmentContainerView, mapFragment);
+            ft.commit();
+        }
     }
     public void onToHelp(View v) {
 

@@ -1,5 +1,6 @@
 package com.asennyey.a5hid;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,6 +30,15 @@ public class Leaderboard extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    public ViewGroup cont;
+
+    private ArrayList<String> names;
+    private ArrayList<String> buildings;
+    private ArrayList<Integer> shits;
+    private ListView listView;
+    private View view;
+    private Context mContext;
 
     public Leaderboard() {
         // Required empty public constructor
@@ -47,18 +63,54 @@ public class Leaderboard extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext=context;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        buildings = new ArrayList<String>();
+        names = new ArrayList<String>();
+        shits = new ArrayList<Integer>();
+        buildings.add("bldg1");
+        buildings.add("bldg2");
+        names.add("name1");
+        names.add("name2");
+        shits.add(3);
+        shits.add(1);
+
+        List<HashMap<String, String>> row = new ArrayList<HashMap<String, String>>();
+        for (int i=0; i<buildings.size(); i++) {
+            HashMap<String, String> hm = new HashMap<String, String>();
+            hm.put("Building", buildings.get(i));
+            hm.put("Person", names.get(i));
+            hm.put("Shits", shits.get(i).toString());
+            row.add(hm);
+        }
+
+        String[] from ={"Building", "Person", "Shits"};
+        int[] to = {R.id.building, R.id.person, R.id.shits};
+
+        SimpleAdapter simpleAdapter = new
+                SimpleAdapter(mContext, row, R.layout.leaderboard_row, from, to);
+
+        listView = (ListView) view.findViewById(R.id.leaderboard_list_view);
+        listView.setAdapter(simpleAdapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_leaderboard, container, false);
+        View v = inflater.inflate(R.layout.fragment_settings, container, false);
+        this.cont = container;
+        this.view = v;
+        return v;
     }
 }
