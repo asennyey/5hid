@@ -77,4 +77,8 @@ public class LocationController {
         }
         return instance;
     }
+
+    public static LocationController getInstance(){
+        return getInstance(null);
+    }
 }

@@ -3,7 +3,6 @@ package com.asennyey.a5hid;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -11,17 +10,16 @@ import com.asennyey.a5hid.api.objects.read.LeaderboardUser;
 import com.asennyey.a5hid.databinding.FragmentLeaderboardBinding;
 import com.asennyey.a5hid.placeholder.PlaceholderContent.PlaceholderItem;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link PlaceholderItem}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class LeaderboardRecyclerViewAdapter extends RecyclerView.Adapter<LeaderboardRecyclerViewAdapter.ViewHolder> {
     private final List<LeaderboardUser> mValues;
 
-    public MyItemRecyclerViewAdapter(List<LeaderboardUser> items) {
+    public LeaderboardRecyclerViewAdapter(List<LeaderboardUser> items) {
         mValues = items;
     }
 

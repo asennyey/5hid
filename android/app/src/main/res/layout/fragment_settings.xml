@@ -5,7 +5,7 @@
     android:id="@+id/settings_linear"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Settings">
+    tools:context=".SettingsFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <ScrollView
@@ -36,7 +36,7 @@
                 android:text="Logged in as: " />
 
             <Button
-                android:id="@+id/log_button"
+                android:id="@+id/logout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Log Out" />

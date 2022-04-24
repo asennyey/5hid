@@ -1,19 +1,26 @@
 package com.asennyey.a5hid;
 
+import android.app.Dialog;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
+import com.asennyey.a5hid.api.ApiController;
+import com.google.android.material.textfield.TextInputLayout;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LoginFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LoginFragment extends Fragment {
+public class LoginFragment extends DialogFragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -55,10 +62,55 @@ public class LoginFragment extends Fragment {
         }
     }
 
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        // Get the layout inflater
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+
+        View view = inflater.inflate(R.layout.fragment_login, null);
+
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        builder.setView(view)
+                .setTitle(R.string.login_title)
+                // Add action buttons
+                .setPositiveButton(R.string.login, (dialog, id) -> {
+
+                })
+                .setNegativeButton(R.string.cancel, (dialog, id) -> getDialog().cancel());
+        return builder.create();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        final AlertDialog d = (AlertDialog)getDialog();
+        if(d != null)
+        {
+            Button positiveButton = (Button) d.getButton(Dialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(v -> {
+                positiveButton.setEnabled(false);
+                com.asennyey.a5hid.api.objects.write.User user = new com.asennyey.a5hid.api.objects.write.User();
+                TextInputLayout usernameLayout = d.findViewById(R.id.user_username_wrapper);
+                user.username = usernameLayout.getEditText().getText().toString();
+                TextInputLayout passwordLayout = d.findViewById(R.id.user_password_wrapper);
+                user.password = passwordLayout.getEditText().getText().toString();
+                ApiController.getInstance().login(
+                        user,
+                        (res)->{
+                            getActivity().invalidateOptionsMenu();
+                            d.dismiss();
+                        },
+                        (err)->{
+                            positiveButton.setEnabled(true);
+                        }
+                );
+
+                //else dialog stays open. Make sure you have an obvious way to close the dialog especially if you set cancellable to false.
+            });
+        }
     }
 }

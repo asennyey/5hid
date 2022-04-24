@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/settings"
-        android:icon="@drawable/ic_launcher_background"
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/login_menu"
+        android:icon="@drawable/ic_baseline_login_24"
+        android:title="@string/login"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/map_menu"
+        android:icon="@drawable/ic_baseline_map_24"
+        android:title="@string/map"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/settings_menu"
+        android:icon="@drawable/ic_baseline_settings_24"
         android:title="@string/settings" />
-    <item android:id="@+id/leaderboard"
-        android:icon="@drawable/ic_launcher_background"
+    <item android:id="@+id/leaderboard_menu"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_baseline_leaderboard_24"
         android:title="@string/leaderboard" />
-    <item android:id="@+id/help"
-        android:icon="@drawable/ic_launcher_foreground"
+    <item android:id="@+id/help_menu"
+        android:icon="@drawable/ic_baseline_help_outline_24"
         android:title="@string/help" />
 </menu>

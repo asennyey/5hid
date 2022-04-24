@@ -2,27 +2,49 @@ package com.asennyey.a5hid;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.asennyey.a5hid.api.ApiController;
+import com.asennyey.a5hid.api.AuthenticationController;
+import com.asennyey.a5hid.api.objects.read.Event;
+import com.asennyey.a5hid.viewmodels.EventViewModel;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.CancellationTokenSource;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    // Allows class to cancel the location request if it exits the activity.
+    // Typically, you use one cancellation source per lifecycle.
+    private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
+    private EventViewModel model;
+    private GoogleMap mMap;
+    private LocationController locationController;
+
+    private SupportMapFragment mapFragment;
+
+    private boolean flag = false;
 
     public MapFragment() {
         // Required empty public constructor
@@ -49,16 +71,68 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        locationController = LocationController.getInstance();
+        model = new ViewModelProvider(this).get(EventViewModel.class);
+        model.getEvents().observe(this, events -> {
+            if(mMap != null) {
+                // update UI
+                for (Event event : events) {
+                    System.out.println(event);
+                    mMap.addMarker(new MarkerOptions().position(event.location).title(event.description)).setTag(event);
+                }
+            }else {
+                flag = true;
+            }
+        });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        View view = inflater.inflate(R.layout.fragment_map, container, false);
+        mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        view.findViewById(R.id.create_event_trigger).setOnClickListener((v)->{
+            if(AuthenticationController.getInstance().isLoggedIn()) {
+                new CreateEventFragment().show(getChildFragmentManager(), "create-event");
+            }else{
+                new LoginFragment().show(getChildFragmentManager(), "login");
+            }
+        });
+        return view;
+    }
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        if(flag){
+            flag = false;
+            model.getEvents();
+        }
+        mMap = googleMap;
+        if(locationController.isLocationEnabled()){
+            mMap.setMyLocationEnabled(true);
+            locationController.getPreciseLocation(cancellationTokenSource, (location)->{
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        location.result,
+                        1
+                ));
+            }, (err)->{
+
+            });
+        }else{
+            // TODO: request location.
+        }
     }
 }

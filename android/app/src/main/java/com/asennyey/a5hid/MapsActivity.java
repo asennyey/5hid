@@ -1,167 +1,120 @@
 package com.asennyey.a5hid;
 
-import static com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY;
-
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
-
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+
 import com.asennyey.a5hid.api.ApiController;
 import com.asennyey.a5hid.api.AuthenticationController;
-import com.asennyey.a5hid.api.objects.read.Event;
-import com.asennyey.a5hid.viewmodels.EventViewModel;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.asennyey.a5hid.databinding.ActivityMapsBinding;
 import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.gms.tasks.Task;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity {
 
-    private GoogleMap mMap;
-    private ActivityMapsBinding binding;
     private ApiController controller;
-
-    // Allows class to cancel the location request if it exits the activity.
-    // Typically, you use one cancellation source per lifecycle.
     private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
     private LocationController locationController;
     private AuthenticationController authController;
-    public boolean logged_in = false;
-    public SupportMapFragment mapFragment;
-    public Fragment otherFragment;
-    public String STATE = "MAP";
 
-    public Button settingsButton;
-    public Button leaderboardButton;
-    public Button helpButton;
-    private boolean flag;
-
-    private EventViewModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getSupportActionBar() != null) {
+            this.getSupportActionBar().hide();
+        }
 
-        binding = ActivityMapsBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_maps);
 
         locationController = LocationController.getInstance(this);
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        controller = ApiController.getInstance(this);
         authController = AuthenticationController.getInstance(this);
-        model = new ViewModelProvider(this).get(EventViewModel.class);
-        model.getEvents().observe(this, events -> {
-            if(mMap != null) {
-                // update UI
-                for (Event event : events) {
-                    mMap.addMarker(new MarkerOptions().position(event.location).title(event.description));
-                }
-            }else {
-                flag = true;
-            }
-        });
-        settingsButton = findViewById(R.id.settings_button);
-        leaderboardButton = findViewById(R.id.leaderboard_button);
-        helpButton = findViewById(R.id.help_button);
+        controller = ApiController.getInstance(this);
+
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        myToolbar.setTitle("5hid");
+        setSupportActionBar(myToolbar);
+
+        showMap();
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+    private void showMap(){
+        show(MapFragment.class, "map");
+    }
+
+    private void showSettings(){
+        show(SettingsFragment.class, "settings");
+    }
+
+    private void showHelp(){
+        //show();
+    }
+
+    private void showLeaderboard(){
+        show(LeaderboardFragment.class, "leaderboard");
+    }
+
+    private void showLogin(){
+        new LoginFragment().show(getSupportFragmentManager(), "login");
+    }
+
+    private void add(Class<? extends Fragment> fragment, String name){
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container_view, fragment, null)
+                .addToBackStack(name)
+                .setReorderingAllowed(true)
+                .commit();
+    }
+
+    private void show(Class<? extends Fragment> fragment, String name){
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.fragment_container_view, fragment, null)
+            .addToBackStack(name)
+            .setReorderingAllowed(true)
+            .commit();
+    }
+
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        if(flag){
-            flag = false;
-            model.getEvents();
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        if (authController.isLoggedIn()) {
+            menu.findItem(R.id.login_menu).setVisible(false);
         }
-        mMap = googleMap;
-        if(locationController.isLocationEnabled()){
-            mMap.setMyLocationEnabled(true);
-            locationController.getPreciseLocation(cancellationTokenSource, (location)->{
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                        location.result,
-                        1
-                ));
-            }, (err)->{
-
-            });
-        }else{
-            // TODO: request location.
-        }
+        return true;
     }
 
-
-    public void onToSettings(View v) {
-        FragmentTransaction ft =
-                getSupportFragmentManager().beginTransaction();
-
-        if (STATE.equals("MAP")) {
-            this.STATE = "SETTINGS";
-            settingsButton.setText("Return");
-            //mapFragment.getView().setVisibility(View.INVISIBLE);
-            otherFragment = new Settings();
-            //someFragment.setContainerActivity(this);
-            //someFragment.setArguments(args);
-            ft.replace(R.id.fragmentContainerView, new Settings());
-            ft.commit();
-        } else {
-            this.STATE = "MAP";
-            settingsButton.setText("Settings");
-            otherFragment.onDestroy();
-            ft.replace(R.id.fragmentContainerView, mapFragment);
-            ft.commit();
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
     }
-    public void onToLeaderboard(View v) {
-        FragmentTransaction ft =
-                getSupportFragmentManager().beginTransaction();
 
-        if (STATE.equals("MAP")) {
-            this.STATE = "LEADER";
-            leaderboardButton.setText("Return");
-            //mapFragment.getView().setVisibility(View.INVISIBLE);
-            //otherFragment.setContainerActivity(this);
-            //otherFragment.setArguments(args);
-            ft.replace(R.id.fragmentContainerView, leaderboard_list_fragment.class, null);
-            ft.commit();
-        } else {
-            this.STATE = "MAP";
-            leaderboardButton.setText("Leaderboard");
-            ft.replace(R.id.fragmentContainerView, mapFragment, null);
-            ft.commit();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.login_menu:
+                showLogin();
+                return true;
+            case R.id.map_menu:
+                showMap();
+                return true;
+            case R.id.settings_menu:
+                showSettings();
+                return true;
+            case R.id.help_menu:
+                //show();
+                return true;
+            case R.id.leaderboard_menu:
+                showLeaderboard();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-    }
-    public void onToHelp(View v) {
-
     }
 
     // button will be within maps fragment
@@ -187,22 +140,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         );
     }
 
-    public void onCreateEventClick(){
-        com.asennyey.a5hid.api.objects.write.Event event = new com.asennyey.a5hid.api.objects.write.Event();
-        event.description = "test from android";
-        locationController.getPreciseLocation(cancellationTokenSource, (location)->{
-            event.location = location.result;
-            controller.createEvent(
-                    event,
-                    (res)->{
-                        System.out.println(res);
-                    },
-                    (err)->{
-                        System.out.println(err);
-                    }
-            );
-        }, (err)->{
-            System.out.println(err.result);
-        });
-    }
 }

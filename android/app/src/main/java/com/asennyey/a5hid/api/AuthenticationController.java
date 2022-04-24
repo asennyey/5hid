@@ -32,6 +32,10 @@ public class AuthenticationController {
         editor.apply();
     }
 
+    public boolean isLoggedIn(){
+        return getJwt().accessToken != null;
+    }
+
     public void logout(){
         this.setJwt(new Jwt());
     }
@@ -45,5 +49,9 @@ public class AuthenticationController {
             AuthenticationController.instance = new AuthenticationController(context);
         }
         return AuthenticationController.instance;
+    }
+
+    public static AuthenticationController getInstance(){
+        return getInstance(null);
     }
 }

@@ -102,7 +102,7 @@ public class HttpClient {
                 //Write
                 OutputStream os = urlConnection.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-                writer.write(data);
+                writer.write(data.replace("\n", "\\n"));
                 writer.close();
                 os.close();
 
