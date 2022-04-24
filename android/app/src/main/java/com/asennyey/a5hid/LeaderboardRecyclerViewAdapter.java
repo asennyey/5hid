@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.asennyey.a5hid.api.objects.read.LeaderboardUser;
+import com.asennyey.a5hid.databinding.FragmentLeaderboardBinding;
 import com.asennyey.a5hid.placeholder.PlaceholderContent.PlaceholderItem;
-import com.asennyey.a5hid.databinding.FragmentLeaderboardListFragmentBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        return new ViewHolder(FragmentLeaderboardListFragmentBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(FragmentLeaderboardBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 
     }
 
@@ -49,7 +49,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         public final TextView mContentView;
         public LeaderboardUser mItem;
 
-        public ViewHolder(FragmentLeaderboardListFragmentBinding binding) {
+        public ViewHolder(FragmentLeaderboardBinding binding) {
             super(binding.getRoot());
             mIdView = binding.itemNumber;
             mContentView = binding.content;
