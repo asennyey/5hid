@@ -106,8 +106,10 @@ INSTALLED_APPS = [
     "django_filters",
     "djoser",
     "drf_yasg",
-    "debug_toolbar",
 ]
+
+if DEBUG:
+    INSTALLED_APPS += ["debug_toolbar"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -176,10 +178,6 @@ INTERNAL_IPS = [
     "localhost",
     # ...
 ]
-
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
-}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
