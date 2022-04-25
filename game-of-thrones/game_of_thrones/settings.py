@@ -106,10 +106,12 @@ INSTALLED_APPS = [
     "django_filters",
     "djoser",
     "drf_yasg",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -168,6 +170,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    "localhost",
+    # ...
+]
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -222,11 +234,38 @@ SWAGGER_SETTINGS = {
 # Define static storage via django-storages[google]
 GS_BUCKET_NAME = env("GS_BUCKET_NAME")
 STATIC_URL = "/static/"
-DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-GS_DEFAULT_ACL = "publicRead"
+if not env("DEBUG"):
+    DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+    STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+    GS_DEFAULT_ACL = "publicRead"
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # [END cloudrun_django_static_config]
 
 AUTH_USER_MODEL = "game_of_thrones.User"
 
 SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'
+
+CACHEOPS_REDIS = {
+    'host': env("REDIS_HOST", default='localhost'), # redis-server is on same machine 
+    'port': 6379,        # default redis port
+
+    'socket_timeout': 3,   # connection timeout in seconds, optional
+}
+
+CACHEOPS = {
+    # Automatically cache any User.objects.get() calls for 2 hours.
+    # This also includes .first() and .last() calls,
+    # as well as request.user or post.author access,
+    # where Post.author is a foreign key to auth.User
+    "auth.user": {"ops": "get", "timeout": 60 * 120},
+    # Automatically cache all gets and queryset fetches
+    # to other django.contrib.auth models for an hour
+    "auth.*": {"ops": {"fetch", "get"}, "timeout": 60 * 60},
+    # Cache all queries to Permission
+    # 'all' is an alias for {'get', 'fetch', 'count', 'aggregate', 'exists'}
+    "auth.permission": {"ops": "all", "timeout": 60 * 60},
+    # Finally you can explicitely forbid even manual caching with:
+    "game_of_thrones.*": {"ops": "all", "timeout": 60 * 60},
+}

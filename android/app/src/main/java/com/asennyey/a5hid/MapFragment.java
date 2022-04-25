@@ -3,6 +3,7 @@ package com.asennyey.a5hid;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -75,6 +76,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         locationController = LocationController.getInstance();
         model = new ViewModelProvider(this).get(EventViewModel.class);
         model.getEvents().observe(this, events -> {
+            System.out.println(mMap);
             if(mMap != null) {
                 // update UI
                 for (Event event : events) {
@@ -126,7 +128,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             locationController.getPreciseLocation(cancellationTokenSource, (location)->{
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         location.result,
-                        1
+                        18
                 ));
             }, (err)->{
 

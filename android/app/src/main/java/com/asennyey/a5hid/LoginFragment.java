@@ -98,6 +98,7 @@ public class LoginFragment extends DialogFragment {
                 user.username = usernameLayout.getEditText().getText().toString();
                 TextInputLayout passwordLayout = d.findViewById(R.id.user_password_wrapper);
                 user.password = passwordLayout.getEditText().getText().toString();
+                System.out.println(user);
                 ApiController.getInstance().login(
                         user,
                         (res)->{

@@ -11,11 +11,10 @@ from django.db.models.functions import Coalesce
 from django_filters import FilterSet, CharFilter, Filter
 from django_filters.constants import EMPTY_VALUES
 from django_filters import rest_framework as filters
+import timeit
 
 from game_of_thrones.models import Event, User
 from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.forms.fields import GeometryCollectionField
-from django.db.models import Prefetch
 
 def get_location_filter_params(query, query_object):
     if query is not None:
@@ -67,16 +66,28 @@ class LocationFilterSet(FilterSet):
         finally:
             return queryset
 
+def is_friend(user, other_user):
+    return user.id in other_user.friends.all()
+
 class AnonNameField(serializers.Field):
     def to_representation(self, value):
+        if value.is_anon and not is_friend(self.context['request'].user, value):
+            return 'Anonymous'
         return f'{value.first_name} {value.last_name[0]}.'
 
 class CustomUserSerializer(serializers.ModelSerializer):
     name = AnonNameField(source="*")
+    is_friend = serializers.SerializerMethodField('get_is_friend')
+
+    def get_is_friend(self, obj):
+        user = self.context['request'].user
+        return is_friend(self.context['request'].user, obj)
+    
     class Meta:
         model = User
         fields = [
-            "name"
+            "name",
+            'is_friend'
         ]
 
 class EventSerializer(serializers.ModelSerializer):
@@ -113,7 +124,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     Viewset for handling tutoring requests.
     """
-    queryset = Event.objects.all()
+    queryset = Event.objects.select_related('user').prefetch_related('user__friends').all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     ordering_fields = ["created_time"]
     filterset_class = LocationFilterSet
@@ -138,7 +149,7 @@ class LeaderboardSerializer(serializers.ModelSerializer):
         fields = ["name", 'overall_score']
 
 class LeaderboardViewSet(viewsets.GenericViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.prefetch_related('friends').all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     ordering_fields = ["created_time"]
     serializer_class=LeaderboardSerializer

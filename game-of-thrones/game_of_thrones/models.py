@@ -1,4 +1,4 @@
-from django.db.models import CharField, EmailField, BooleanField, SET_NULL, DateTimeField, ForeignKey, Model, IntegerField, ImageField
+from django.db.models import CharField, EmailField, BooleanField, SET_NULL, DateTimeField, ForeignKey, Model, IntegerField, ManyToManyField
 from django.contrib.auth.base_user import AbstractBaseUser
 from game_of_thrones.managers.user import UserManager
 from django.contrib.gis.db.models import PointField
@@ -9,6 +9,8 @@ class User(AbstractBaseUser):
     email: EmailField = EmailField(unique=True)
     is_admin: BooleanField = BooleanField(default=False)
     is_active: BooleanField = BooleanField(default=False)
+    is_anon: BooleanField = BooleanField(default=True)
+    friends: ManyToManyField = ManyToManyField("self", blank=True, symmetrical=False)
 
     objects:UserManager = UserManager()
 

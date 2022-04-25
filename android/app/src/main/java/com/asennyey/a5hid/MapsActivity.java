@@ -9,13 +9,16 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.asennyey.a5hid.api.ApiController;
 import com.asennyey.a5hid.api.AuthenticationController;
+import com.asennyey.a5hid.viewmodels.EventViewModel;
 import com.google.android.gms.tasks.CancellationTokenSource;
 
-public class MapsActivity extends AppCompatActivity {
+public class MapsActivity extends AppCompatActivity implements ApiDialogFragment.ApiDialogListener {
 
     private ApiController controller;
     private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -140,4 +143,16 @@ public class MapsActivity extends AppCompatActivity {
         );
     }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        if(dialog instanceof CreateEventFragment) {
+            EventViewModel model = new ViewModelProvider(this).get(EventViewModel.class);
+            model.getEvents();
+        }
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }
 }
