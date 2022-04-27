@@ -16,6 +16,7 @@ distlib==0.3.4
 Django==3.2.12
 django-cacheops==6.0
 django-cors-headers==3.11.0
+django-debug-toolbar==3.2.4
 django-environ==0.8.1
 django-filter==21.1
 django-rest-framework==0.1.0
