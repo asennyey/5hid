@@ -252,6 +252,12 @@ CACHEOPS_REDIS = {
     'socket_timeout': 3,   # connection timeout in seconds, optional
 }
 
+DJOSER = {
+    "SERIALIZERS": {
+        "user": "game_of_thrones.views.UserListSerializer",
+    },
+}
+
 CACHEOPS = {
     # Automatically cache any User.objects.get() calls for 2 hours.
     # This also includes .first() and .last() calls,

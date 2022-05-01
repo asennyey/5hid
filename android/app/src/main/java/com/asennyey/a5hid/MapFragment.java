@@ -123,6 +123,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             model.getEvents();
         }
         mMap = googleMap;
+        mMap.setPadding(0, 0, 0, this.getActivity().findViewById(R.id.create_event_trigger).getHeight());
         if(locationController.isLocationEnabled()){
             mMap.setMyLocationEnabled(true);
             locationController.getPreciseLocation(cancellationTokenSource, (location)->{

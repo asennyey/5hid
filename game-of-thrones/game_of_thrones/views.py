@@ -69,6 +69,10 @@ class LocationFilterSet(FilterSet):
 def is_friend(user, other_user):
     return user.id in other_user.friends.all()
 
+class NameField(serializers.Field):
+    def to_representation(self, value):
+        return f'{value.first_name} {value.last_name[0]}.'
+
 class AnonNameField(serializers.Field):
     def to_representation(self, value):
         if value.is_anon and not is_friend(self.context['request'].user, value):
@@ -166,3 +170,36 @@ class LeaderboardViewSet(viewsets.GenericViewSet):
 
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
+
+class UserListSerializer(serializers.ModelSerializer):
+    name = NameField(source="*")
+    class Meta:
+        model = User
+        fields = ["name", 'email', 'friends', 'id']
+
+class FriendsViewSet(viewsets.GenericViewSet):
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
+    ordering_fields = ["created_time"]
+    serializer_class=LeaderboardSerializer
+
+    @action(detail=True, methods=["POST"])
+    def add(self, request, pk=None):
+        user = request.user
+        try:
+            user.friends.add(self.get_object())
+            user.save()
+            return Response(status=200)
+        except:
+            return Response(status=400)
+
+    @action(detail=True, methods=["POST"])
+    def remove(self, request, pk=None):
+        user = request.user
+        try:
+            user.friends.remove(self.get_object())
+            user.save()
+            return Response(status=200)
+        except:
+            return Response(status=400)
+

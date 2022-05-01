@@ -63,6 +63,10 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
         show(LeaderboardFragment.class, "leaderboard");
     }
 
+    private void showFriends(){
+        show(UserFragment.class, "friends");
+    }
+
     private void showLogin(){
         new LoginFragment().show(getSupportFragmentManager(), "login");
     }
@@ -114,6 +118,9 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
                 return true;
             case R.id.leaderboard_menu:
                 showLeaderboard();
+                return true;
+            case R.id.friends_menu:
+                showFriends();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

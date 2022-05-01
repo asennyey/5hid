@@ -19,12 +19,13 @@ from rest_framework import routers
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from game_of_thrones.views import EventViewSet, LeaderboardViewSet
+from game_of_thrones.views import EventViewSet, FriendsViewSet, LeaderboardViewSet
 
 
 router = routers.SimpleRouter()
 router.register(r"events", EventViewSet)
 router.register(r"leaderboard", LeaderboardViewSet)
+router.register(r"friend", FriendsViewSet)
 
 schema_view = get_schema_view(
     openapi.Info(

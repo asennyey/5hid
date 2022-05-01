@@ -46,6 +46,7 @@ public class ApiController {
         try {
             client.get(
                     new URL(getApiUrl() + "/events"),
+                    AuthenticationController.getInstance().getJwt(),
                     (res)->{
                         JsonReader reader = null;
                         try {
@@ -119,6 +120,48 @@ public class ApiController {
         }
     }
 
+    public void getUsers(Callback<PagedResponse<User>> onSuccess, Callback<Exception> onError){
+        JsonHelper<User> helper = new JsonHelper<>();
+        try {
+            client.get(
+                    new URL(getApiUrl() + "/auth/users/"),
+                    AuthenticationController.getInstance().getJwt(),
+                    (res)->{
+                        JsonReader reader = null;
+                        try {
+                            reader = new JsonReader(new InputStreamReader(res.result.stream,"UTF-8"));
+                            PagedResponse<User> currentPage = helper.readPage(reader, this::readUser);
+                            runOnMainThread(()->onSuccess.onResult(new Result<>(currentPage)));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    },
+                    (err)-> {
+                        BufferedReader r = new BufferedReader(new InputStreamReader(err.result.stream));
+                        StringBuilder total = new StringBuilder();
+                        try {
+                            for (String line; (line = r.readLine()) != null; ) {
+                                total.append(line).append('\n');
+                            }
+                            System.out.println(total.toString());
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        runOnMainThread(() -> onError.onResult(
+                                new Result<>(
+                                        new Exception(String.valueOf(err.result.statusCode))
+                                )
+                        ));
+                    });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            runOnMainThread(()->onError.onResult(new Result<>(e)));
+        }
+    }
+
+
+
     //reads each json response and parses it
     private Event readEvent(JsonReader reader){
         Event event = new Event();
@@ -185,6 +228,15 @@ public class ApiController {
                 switch(reader.nextName()){
                     case "name":
                         user.name = reader.nextString();
+                        break;
+                    case "email":
+                        user.email = reader.nextString();
+                        break;
+                    case "first_name":
+                        user.firstName = reader.nextString();
+                        break;
+                    case "last_name":
+                        user.lastName = reader.nextString();
                         break;
                     default:
                         reader.skipValue();
@@ -269,6 +321,74 @@ public class ApiController {
             client.post(
                     new URL(getApiUrl() + "/events/"),
                     event.toString(),
+                    auth.getJwt(),
+                    (res)->{
+                        runOnMainThread(()->onSuccess.onResult(new Result<>(true)));
+                    },
+                    (err)-> {
+                        BufferedReader r = new BufferedReader(new InputStreamReader(err.result.stream));
+                        StringBuilder total = new StringBuilder();
+                        try {
+                            for (String line; (line = r.readLine()) != null; ) {
+                                total.append(line).append('\n');
+                            }
+                            System.out.println(total.toString());
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        runOnMainThread(() -> onError.onResult(
+                                new Result<>(
+                                        new Exception(String.valueOf(err.result.statusCode))
+                                )
+                        ));
+                    });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            runOnMainThread(()->onError.onResult(new Result<>(e)));
+        }
+    }
+
+    public void addFriend(String id, Callback<Boolean> onSuccess, Callback<Exception> onError){
+        System.out.println(auth.getJwt());
+        try {
+            client.post(
+                    new URL(getApiUrl() + "/friends/"+id+"/add/"),
+                    "",
+                    auth.getJwt(),
+                    (res)->{
+                        runOnMainThread(()->onSuccess.onResult(new Result<>(true)));
+                    },
+                    (err)-> {
+                        BufferedReader r = new BufferedReader(new InputStreamReader(err.result.stream));
+                        StringBuilder total = new StringBuilder();
+                        try {
+                            for (String line; (line = r.readLine()) != null; ) {
+                                total.append(line).append('\n');
+                            }
+                            System.out.println(total.toString());
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        runOnMainThread(() -> onError.onResult(
+                                new Result<>(
+                                        new Exception(String.valueOf(err.result.statusCode))
+                                )
+                        ));
+                    });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            runOnMainThread(()->onError.onResult(new Result<>(e)));
+        }
+    }
+
+    public void removeFriend(String id, Callback<Boolean> onSuccess, Callback<Exception> onError){
+        System.out.println(auth.getJwt());
+        try {
+            client.post(
+                    new URL(getApiUrl() + "/friends/"+id+"/remove/"),
+                    "",
                     auth.getJwt(),
                     (res)->{
                         runOnMainThread(()->onSuccess.onResult(new Result<>(true)));

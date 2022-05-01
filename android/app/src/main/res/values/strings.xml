@@ -12,4 +12,5 @@
     <string name="create_event_title">Create Event</string>
     <string name="login">Login</string>
     <string name="login_title">Login</string>
+    <string name="friends">Friends</string>
 </resources>
