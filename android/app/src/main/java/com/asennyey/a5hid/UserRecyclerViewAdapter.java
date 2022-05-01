@@ -23,6 +23,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
 
     private final List<User> mValues;
     private ApiController api = ApiController.getInstance();
+    private OnItemClickListener listener;
 
     public UserRecyclerViewAdapter(List<User> items) {
         mValues = items;
@@ -43,7 +44,14 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
         holder.mContentView.setText(item.email);
         holder.addFriend.setOnClickListener((v)->{
             api.addFriend(item.id, (res)->{
-                
+                if(listener!=null)listener.onClick(holder.mItem);
+            }, (err)->{
+
+            });
+        });
+        holder.removeFriend.setOnClickListener((v)->{
+            api.removeFriend(item.id, (res)->{
+                if(listener!=null)listener.onClick(holder.mItem);
             }, (err)->{
 
             });
@@ -59,6 +67,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
         public final TextView mIdView;
         public final TextView mContentView;
         public final Button addFriend;
+        public final Button removeFriend;
         public User mItem;
 
         public ViewHolder(FragmentUserBinding binding) {
@@ -66,6 +75,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
             mIdView = binding.itemNumber;
             mContentView = binding.content;
             addFriend = binding.friendAdd;
+            removeFriend = binding.friendRemove;
         }
 
         @Override
@@ -73,4 +83,8 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
             return super.toString() + " '" + mContentView.getText() + "'";
         }
     }
+}
+
+interface OnItemClickListener{
+    void onClick(User item);
 }
