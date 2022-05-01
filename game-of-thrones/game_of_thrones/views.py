@@ -177,11 +177,25 @@ class UserListSerializer(serializers.ModelSerializer):
         model = User
         fields = ["name", 'email', 'friends', 'id']
 
-class FriendsViewSet(viewsets.GenericViewSet):
-    queryset = User.objects.all()
+class FriendSerializer(serializers.ModelSerializer):
+    is_friend = serializers.SerializerMethodField('get_is_friend')
+    name = NameField(source="*")
+
+    def get_is_friend(self, obj):
+        user = self.context['request'].user
+        return is_friend(self.context['request'].user, obj)
+
+    class Meta:
+        model = User
+        fields = ["name", 'email', 'id', 'is_friend']
+
+class FriendsViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     ordering_fields = ["created_time"]
-    serializer_class=LeaderboardSerializer
+    serializer_class=FriendSerializer
+
+    def get_queryset(self):
+        return User.objects.exclude(id=self.request.user.id)
 
     @action(detail=True, methods=["POST"])
     def add(self, request, pk=None):

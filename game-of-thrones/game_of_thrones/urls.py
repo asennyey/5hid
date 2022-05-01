@@ -25,7 +25,7 @@ from game_of_thrones.views import EventViewSet, FriendsViewSet, LeaderboardViewS
 router = routers.SimpleRouter()
 router.register(r"events", EventViewSet)
 router.register(r"leaderboard", LeaderboardViewSet)
-router.register(r"friend", FriendsViewSet)
+router.register(r"friends", FriendsViewSet, basename="Friends")
 
 schema_view = get_schema_view(
     openapi.Info(
