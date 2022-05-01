@@ -160,7 +160,45 @@ public class ApiController {
         }
     }
 
-
+    public void getFriendableUsers(Callback<PagedResponse<User>> onSuccess, Callback<Exception> onError){
+        JsonHelper<User> helper = new JsonHelper<>();
+        try {
+            client.get(
+                    new URL(getApiUrl() + "/friends/"),
+                    AuthenticationController.getInstance().getJwt(),
+                    (res)->{
+                        JsonReader reader = null;
+                        try {
+                            reader = new JsonReader(new InputStreamReader(res.result.stream,"UTF-8"));
+                            PagedResponse<User> currentPage = helper.readPage(reader, this::readUser);
+                            runOnMainThread(()->onSuccess.onResult(new Result<>(currentPage)));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    },
+                    (err)-> {
+                        BufferedReader r = new BufferedReader(new InputStreamReader(err.result.stream));
+                        StringBuilder total = new StringBuilder();
+                        try {
+                            for (String line; (line = r.readLine()) != null; ) {
+                                total.append(line).append('\n');
+                            }
+                            System.out.println(total.toString());
+                        }
+                        catch(Exception e){
+                            e.printStackTrace();
+                        }
+                        runOnMainThread(() -> onError.onResult(
+                                new Result<>(
+                                        new Exception(String.valueOf(err.result.statusCode))
+                                )
+                        ));
+                    });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            runOnMainThread(()->onError.onResult(new Result<>(e)));
+        }
+    }
 
     //reads each json response and parses it
     private Event readEvent(JsonReader reader){
@@ -232,11 +270,11 @@ public class ApiController {
                     case "email":
                         user.email = reader.nextString();
                         break;
-                    case "first_name":
-                        user.firstName = reader.nextString();
+                    case "is_friend":
+                        user.isFriend = reader.nextBoolean();
                         break;
-                    case "last_name":
-                        user.lastName = reader.nextString();
+                    case "id":
+                        user.id = reader.nextInt();
                         break;
                     default:
                         reader.skipValue();
@@ -349,7 +387,7 @@ public class ApiController {
         }
     }
 
-    public void addFriend(String id, Callback<Boolean> onSuccess, Callback<Exception> onError){
+    public void addFriend(int id, Callback<Boolean> onSuccess, Callback<Exception> onError){
         System.out.println(auth.getJwt());
         try {
             client.post(
@@ -383,7 +421,7 @@ public class ApiController {
         }
     }
 
-    public void removeFriend(String id, Callback<Boolean> onSuccess, Callback<Exception> onError){
+    public void removeFriend(int id, Callback<Boolean> onSuccess, Callback<Exception> onError){
         System.out.println(auth.getJwt());
         try {
             client.post(

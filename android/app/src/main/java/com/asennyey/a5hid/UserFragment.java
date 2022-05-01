@@ -53,8 +53,9 @@ public class UserFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        api.getUsers((page)->{
+        api.getFriendableUsers((page)->{
             adapter.notifyItemRangeRemoved(0, users.size());
+            System.out.println(page.result.records);
             users.clear();
             users.addAll(page.result.records);
             adapter.notifyItemRangeInserted(0, page.result.records.size());

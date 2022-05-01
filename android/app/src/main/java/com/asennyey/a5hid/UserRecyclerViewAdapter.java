@@ -40,7 +40,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
     public void onBindViewHolder(final ViewHolder holder, int position) {
         User item = mValues.get(position);
         holder.mItem = item;
-        holder.mIdView.setText(item.firstName + " "+ item.lastName);
+        holder.mIdView.setText(item.name);
         holder.mContentView.setText(item.email);
         holder.addFriend.setOnClickListener((v)->{
             api.addFriend(item.id, (res)->{
@@ -49,6 +49,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
 
             });
         });
+        holder.addFriend.setVisibility(item.isFriend ? View.INVISIBLE : View.VISIBLE);
         holder.removeFriend.setOnClickListener((v)->{
             api.removeFriend(item.id, (res)->{
                 if(listener!=null)listener.onClick(holder.mItem);
@@ -56,6 +57,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
 
             });
         });
+        holder.removeFriend.setVisibility(item.isFriend ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override

@@ -195,7 +195,7 @@ class FriendsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class=FriendSerializer
 
     def get_queryset(self):
-        return User.objects.exclude(id=self.request.user.id)
+        return User.objects.exclude(id=self.request.user.id).prefetch_related('friends')
 
     @action(detail=True, methods=["POST"])
     def add(self, request, pk=None):
