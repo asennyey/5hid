@@ -67,6 +67,8 @@ class LocationFilterSet(FilterSet):
             return queryset
 
 def is_friend(user, other_user):
+    if not user or not user.friends:
+        return False
     return other_user in user.friends.all()
 
 class NameField(serializers.Field):

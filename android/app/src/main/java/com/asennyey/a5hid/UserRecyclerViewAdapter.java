@@ -49,7 +49,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
 
             });
         });
-        holder.addFriend.setVisibility(item.isFriend ? View.INVISIBLE : View.VISIBLE);
+        holder.addFriend.setVisibility(item.isFriend ? View.GONE : View.VISIBLE);
         holder.removeFriend.setOnClickListener((v)->{
             api.removeFriend(item.id, (res)->{
                 if(listener!=null)listener.onClick(holder.mItem);
@@ -57,12 +57,16 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
 
             });
         });
-        holder.removeFriend.setVisibility(item.isFriend ? View.VISIBLE : View.INVISIBLE);
+        holder.removeFriend.setVisibility(item.isFriend ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    public void setOnClickListener(OnItemClickListener listener){
+        this.listener = listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

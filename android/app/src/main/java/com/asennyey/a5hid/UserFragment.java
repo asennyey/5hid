@@ -52,7 +52,10 @@ public class UserFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getData();
+    }
 
+    private void getData(){
         api.getFriendableUsers((page)->{
             adapter.notifyItemRangeRemoved(0, users.size());
             System.out.println(page.result.records);
@@ -79,6 +82,9 @@ public class UserFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             adapter = new UserRecyclerViewAdapter(users);
+            adapter.setOnClickListener((item)->{
+                getData();
+            });
             recyclerView.setAdapter(adapter);
         }
         return view;
