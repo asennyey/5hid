@@ -67,7 +67,7 @@ class LocationFilterSet(FilterSet):
             return queryset
 
 def is_friend(user, other_user):
-    return user.id in other_user.friends.all()
+    return other_user in user.friends.all()
 
 class NameField(serializers.Field):
     def to_representation(self, value):
@@ -195,7 +195,7 @@ class FriendsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class=FriendSerializer
 
     def get_queryset(self):
-        return User.objects.exclude(id=self.request.user.id).prefetch_related('friends')
+        return User.objects.prefetch_related('friends').exclude(id=self.request.user.id)
 
     @action(detail=True, methods=["POST"])
     def add(self, request, pk=None):
