@@ -67,7 +67,7 @@ class LocationFilterSet(FilterSet):
             return queryset
 
 def is_friend(user, other_user):
-    if not user or not user.friends:
+    if not user.is_authenticated:
         return False
     return other_user in user.friends.all()
 

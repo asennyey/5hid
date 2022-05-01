@@ -91,6 +91,8 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
     public boolean onPrepareOptionsMenu (Menu menu) {
         if (authController.isLoggedIn()) {
             menu.findItem(R.id.login_menu).setVisible(false);
+        }else{
+            menu.findItem(R.id.friends_menu).setVisible(false);
         }
         return true;
     }
