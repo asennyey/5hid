@@ -77,7 +77,10 @@ class NameField(serializers.Field):
 
 class AnonNameField(serializers.Field):
     def to_representation(self, value):
-        if value.is_anon and not is_friend(self.context['request'].user, value):
+        user = self.context['request'].user
+        if value.id == user.id:
+            return 'You'
+        elif value.is_anon and not is_friend(user, value):
             return 'Anonymous'
         return f'{value.first_name} {value.last_name[0]}.'
 
@@ -93,7 +96,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "name",
-            'is_friend'
+            'is_friend',
+            'id'
         ]
 
 class EventSerializer(serializers.ModelSerializer):
@@ -152,7 +156,7 @@ class LeaderboardSerializer(serializers.ModelSerializer):
     name = AnonNameField(source="*")
     class Meta:
         model = User
-        fields = ["name", 'overall_score']
+        fields = ["name", 'overall_score', 'id']
 
 class LeaderboardViewSet(viewsets.GenericViewSet):
     queryset = User.objects.prefetch_related('friends').all()
@@ -202,12 +206,9 @@ class FriendsViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=["POST"])
     def add(self, request, pk=None):
         user = request.user
-        try:
-            user.friends.add(self.get_object())
-            user.save()
-            return Response(status=200)
-        except:
-            return Response(status=400)
+        user.friends.add(self.get_object())
+        user.save()
+        return Response(status=200)
 
     @action(detail=True, methods=["POST"])
     def remove(self, request, pk=None):
