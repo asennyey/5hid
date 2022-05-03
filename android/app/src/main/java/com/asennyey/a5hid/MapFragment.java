@@ -1,5 +1,6 @@
 package com.asennyey.a5hid;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.asennyey.a5hid.api.ApiController;
 import com.asennyey.a5hid.api.AuthenticationController;
@@ -19,6 +21,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.CancellationTokenSource;
@@ -28,7 +32,7 @@ import com.google.android.gms.tasks.CancellationTokenSource;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -81,12 +85,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 // update UI
                 for (Event event : events) {
                     System.out.println(event);
-                    mMap.addMarker(new MarkerOptions().position(event.location).title(event.description)).setTag(event);
+                    addMarker(event);
                 }
             }else {
                 flag = true;
             }
         });
+    }
+
+    private void addMarker(Event event){
+        Marker marker = mMap.addMarker(new MarkerOptions().position(event.location).title(event.description));
+        if(event.user.isFriend){
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        }
+        System.out.println(marker);
+        marker.setTag(event);
     }
 
     @Override
@@ -118,11 +131,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
         if(flag){
             flag = false;
-            model.getEvents();
+            for (Event event : model.getEvents().getValue()) {
+                System.out.println(event);
+                addMarker(event);
+            }
         }
-        mMap = googleMap;
         mMap.setPadding(0, 0, 0, this.getActivity().findViewById(R.id.create_event_trigger).getHeight());
         if(locationController.isLocationEnabled()){
             mMap.setMyLocationEnabled(true);
@@ -137,5 +153,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }else{
             // TODO: request location.
         }
+
+        // Set a listener for marker click.
+        mMap.setOnMarkerClickListener(this);
+    }
+
+    /** Called when the user clicks a marker. */
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+
+        // Retrieve the data from the marker.
+        Event event = (Event) marker.getTag();
+
+        // Check if a click count was set, then display the click count.
+        if (event != null) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            LatLng pos = marker.getPosition();
+            intent.putExtra(Intent.EXTRA_TEXT, "Let's start a game of thrones at: " + pos.longitude + "," + pos.latitude );
+            intent.setType("text/plain");
+            startActivity(intent);
+        }
+
+        // Return false to indicate that we have not consumed the event and that we wish
+        // for the default behavior to occur (which is for the camera to move such that the
+        // marker is centered and for the marker's info window to open, if it has one).
+        return false;
     }
 }

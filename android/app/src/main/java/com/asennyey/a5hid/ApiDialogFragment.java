@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.asennyey.a5hid.api.ApiController;
 import com.asennyey.a5hid.api.Callback;
+import com.asennyey.a5hid.api.Result;
 import com.asennyey.a5hid.viewmodels.EventViewModel;
 import com.google.android.gms.common.api.Api;
 import com.google.android.material.textfield.TextInputLayout;
@@ -80,7 +81,7 @@ public abstract class ApiDialogFragment extends DialogFragment {
             Button negativeButton = (Button) d.getButton(Dialog.BUTTON_NEGATIVE);
             negativeButton.setOnClickListener(v -> {
                 negativeButton.setEnabled(false);
-                this.onPositiveButtonClick(getDialog(), (success)->{
+                this.onNegativeButtonClick(getDialog(), (success)->{
                     negativeButton.setEnabled(true);
                     if(success.result){
                         d.dismiss();
@@ -112,5 +113,7 @@ public abstract class ApiDialogFragment extends DialogFragment {
 
     public abstract void onPositiveButtonClick(Dialog root, Callback<Boolean> onAfter);
 
-    public abstract void onNegativeButtonClick(Dialog root, Callback<Boolean> onAfter);
+    public void onNegativeButtonClick(Dialog root, Callback<Boolean> onAfter){
+        onAfter.onResult(new Result<>(true));
+    }
 }

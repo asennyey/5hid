@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.asennyey.a5hid.api.ApiController;
@@ -14,6 +16,7 @@ import com.asennyey.a5hid.placeholder.PlaceholderContent.PlaceholderItem;
 import com.asennyey.a5hid.databinding.FragmentUserBinding;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link PlaceholderItem}.
@@ -24,6 +27,8 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
     private final List<User> mValues;
     private ApiController api = ApiController.getInstance();
     private OnItemClickListener listener;
+
+    public Set<String> emails;
 
     public UserRecyclerViewAdapter(List<User> items) {
         mValues = items;
@@ -41,7 +46,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
         User item = mValues.get(position);
         holder.mItem = item;
         holder.mIdView.setText(item.name);
-        holder.mContentView.setText(item.email);
+        holder.mContentView.setText("("+item.email+")");
         holder.addFriend.setOnClickListener((v)->{
             api.addFriend(item.id, (res)->{
                 if(listener!=null)listener.onClick(holder.mItem);
@@ -58,6 +63,9 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
             });
         });
         holder.removeFriend.setVisibility(item.isFriend ? View.VISIBLE : View.GONE);
+        if(this.emails != null) {
+            holder.isContact.setVisibility(this.emails.contains(item.email) ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override
@@ -72,8 +80,9 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mIdView;
         public final TextView mContentView;
-        public final Button addFriend;
-        public final Button removeFriend;
+        public final ImageButton addFriend;
+        public final ImageButton removeFriend;
+        public final ImageView isContact;
         public User mItem;
 
         public ViewHolder(FragmentUserBinding binding) {
@@ -82,6 +91,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
             mContentView = binding.content;
             addFriend = binding.friendAdd;
             removeFriend = binding.friendRemove;
+            isContact = binding.isContact;
         }
 
         @Override

@@ -2,6 +2,7 @@ package com.asennyey.a5hid;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -33,6 +34,9 @@ public class LeaderboardRecyclerViewAdapter extends RecyclerView.Adapter<Leaderb
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+        if(holder.mItem.name.equals("You")){
+            holder.mIdView.setTextColor(Color.BLUE);
+        }
         holder.mIdView.setText(mValues.get(position).name);
         holder.mContentView.setText(""+mValues.get(position).score);
     }

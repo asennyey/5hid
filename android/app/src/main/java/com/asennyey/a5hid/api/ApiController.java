@@ -86,6 +86,7 @@ public class ApiController {
         try {
             client.get(
                     new URL(getApiUrl() + "/leaderboard"),
+                    auth.getJwt(),
                     (res)->{
                         JsonReader reader = null;
                         try {

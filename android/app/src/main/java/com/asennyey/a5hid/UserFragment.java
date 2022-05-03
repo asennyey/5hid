@@ -1,6 +1,8 @@
 package com.asennyey.a5hid;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,6 +10,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.ContactsContract;
+import android.util.ArraySet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,7 @@ import com.asennyey.a5hid.placeholder.PlaceholderContent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A fragment representing a list of Items.
@@ -55,8 +60,33 @@ public class UserFragment extends Fragment {
         getData();
     }
 
+    /**
+     * Return the list of all elements generated from the cursor.
+     * @return list of all contacts.
+     */
+    private Set<String> getEmails(){
+        Set<String> emailList = new ArraySet<>();
+        ContentResolver resolver = this.getActivity().getContentResolver();
+        Cursor cursor = resolver.query( ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+        while (cursor.moveToNext()) {
+            String id = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+            Cursor emailCur = resolver.query(
+                    ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                    null,
+                    ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+                    new String[]{id}, null);
+            while (emailCur.moveToNext()) {
+                String email = emailCur.getString(emailCur.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Email.DATA));
+                emailList.add(email); // Here you will get list of email.
+            }
+            emailCur.close();
+        } cursor.close();
+        return emailList;
+    }
+
     private void getData(){
         api.getFriendableUsers((page)->{
+            adapter.emails = getEmails();
             adapter.notifyItemRangeRemoved(0, users.size());
             System.out.println(page.result.records);
             users.clear();
