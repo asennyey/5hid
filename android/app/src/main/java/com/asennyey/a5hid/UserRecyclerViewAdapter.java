@@ -51,7 +51,7 @@ public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerVi
             api.addFriend(item.id, (res)->{
                 if(listener!=null)listener.onClick(holder.mItem);
             }, (err)->{
-
+                System.out.println(err);
             });
         });
         holder.addFriend.setVisibility(item.isFriend ? View.GONE : View.VISIBLE);

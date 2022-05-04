@@ -84,7 +84,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             if(mMap != null) {
                 // update UI
                 for (Event event : events) {
-                    System.out.println(event);
                     addMarker(event);
                 }
             }else {
@@ -97,8 +96,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Marker marker = mMap.addMarker(new MarkerOptions().position(event.location).title(event.description));
         if(event.user.isFriend){
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        }else if(event.user.name.equals("You")){
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
         }
-        System.out.println(marker);
         marker.setTag(event);
     }
 
@@ -164,7 +164,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         // Retrieve the data from the marker.
         Event event = (Event) marker.getTag();
-
         // Check if a click count was set, then display the click count.
         if (event != null) {
             Intent intent = new Intent(Intent.ACTION_SEND);
@@ -172,6 +171,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             intent.putExtra(Intent.EXTRA_TEXT, "Let's start a game of thrones at: " + pos.longitude + "," + pos.latitude );
             intent.setType("text/plain");
             startActivity(intent);
+            return true;
         }
 
         // Return false to indicate that we have not consumed the event and that we wish
