@@ -29,11 +29,11 @@
                 android:layout_height="wrap_content"
                 android:text="Notifications: On/Off" />
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Logged in as: " />
+<!--            <TextView-->
+<!--                android:id="@+id/textView"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Logged in as: " />-->
 
             <Button
                 android:id="@+id/logout"

@@ -3,18 +3,20 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/activity_maps.xml" value="0.17119565217391305" />
+        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/fragment_help.xml" value="0.12613981762917933" />
+        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/fragment_login.xml" value="0.259375" />
+        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/fragment_map.xml" value="0.176" />
+        <entry key="..\:/Users/Moise/Desktop/CSC_317/5hid/android/app/src/main/res/layout/fragment_settings.xml" value="0.17119565217391305" />
         <entry key="app/src/main/res/drawable/ic_baseline_map_24.xml" value="0.3260416666666667" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_create_event.xml" value="0.375" />
-        <entry key="app/src/main/res/layout/fragment_help.xml" value="0.15070921985815602" />
         <entry key="app/src/main/res/layout/fragment_leaderboard.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_leaderboard_list_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_leaderboard_list_fragment_list.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_map.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.15070921985815602" />
-        <entry key="app/src/main/res/layout/fragment_user.xml" value="0.1526268115942029" />
-        <entry key="app/src/main/res/layout/fragment_user_list.xml" value="0.14387031408308004" />
         <entry key="app/src/main/res/layout/menu.xml" value="0.1" />
         <entry key="app/src/main/res/menu/main.xml" value="0.16770833333333332" />
       </map>

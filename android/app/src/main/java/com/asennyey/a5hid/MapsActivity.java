@@ -5,12 +5,15 @@
 
 package com.asennyey.a5hid;
 
+import android.app.UiModeManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -31,6 +34,8 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
     private LocationController locationController;
     private AuthenticationController authController;
 
+    private UiModeManager uiModeManager;
+    public static Boolean darkToggleOn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +54,34 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
         myToolbar.setTitle("5hid");
         setSupportActionBar(myToolbar);
 
+        uiModeManager = (UiModeManager) getSystemService(UI_MODE_SERVICE);
+
         showMap();
     }
 
+    public boolean get_toggle() {
+        return this.darkToggleOn;
+    }
+    public void set_toggle(boolean bool) {
+        this.darkToggleOn = bool;
+    }
+
+    public void do_animation(int anim_id) {
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), anim_id);
+        ImageView iv = findViewById(R.id.poop_logo);
+        iv.setVisibility(View.VISIBLE);
+
+        iv.startAnimation(animation);
+        iv.setVisibility(View.INVISIBLE);
+    }
+
     private void showMap(){
+        do_animation(R.anim.fall_animation);
         show(MapFragment.class, "map");
     }
 
     private void showSettings(){
+        do_animation(R.anim.fall_animation);
         show(SettingsFragment.class, "settings");
     }
 
@@ -65,10 +90,12 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
     }
 
     private void showLeaderboard(){
+        do_animation(R.anim.fall_animation);
         show(LeaderboardFragment.class, "leaderboard");
     }
 
     private void showFriends(){
+        do_animation(R.anim.fall_animation);
         show(UserFragment.class, "friends");
     }
 
