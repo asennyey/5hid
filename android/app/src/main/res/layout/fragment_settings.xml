@@ -23,11 +23,11 @@
                 android:layout_height="wrap_content"
                 android:text="Theme: Light/Dark" />
 
-            <Switch
-                android:id="@+id/notifications_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Notifications: On/Off" />
+<!--            <Switch-->
+<!--                android:id="@+id/notifications_switch"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Notifications: On/Off" />-->
 
             <TextView
                 android:id="@+id/textView"
