@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.JsonReader;
+import android.util.JsonToken;
 
 import com.asennyey.a5hid.api.json.JsonHelper;
 import com.asennyey.a5hid.api.json.PagedResponse;
@@ -269,7 +270,11 @@ public class ApiController {
                         user.name = reader.nextString();
                         break;
                     case "email":
-                        user.email = reader.nextString();
+                        if(reader.peek() != JsonToken.NULL) {
+                            user.email = reader.nextString();
+                        }else{
+                            reader.skipValue();
+                        }
                         break;
                     case "is_friend":
                         user.isFriend = reader.nextBoolean();

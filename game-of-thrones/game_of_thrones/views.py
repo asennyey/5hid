@@ -84,18 +84,26 @@ class AnonNameField(serializers.Field):
             return 'Anonymous'
         return f'{value.first_name} {value.last_name[0]}.'
 
+class AnonEmailField(serializers.Field):
+    def to_representation(self, value):
+        user = self.context['request'].user
+        if value.is_anon and not is_friend(user, value):
+            return None
+        return value.email
+
 class CustomUserSerializer(serializers.ModelSerializer):
     name = AnonNameField(source="*")
+    email = AnonEmailField(source="*")
     is_friend = serializers.SerializerMethodField('get_is_friend')
 
     def get_is_friend(self, obj):
-        user = self.context['request'].user
         return is_friend(self.context['request'].user, obj)
     
     class Meta:
         model = User
         fields = [
             "name",
+            "email",
             'is_friend',
             'id'
         ]

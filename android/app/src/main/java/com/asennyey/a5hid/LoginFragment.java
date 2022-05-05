@@ -52,8 +52,9 @@ public class LoginFragment extends ApiDialogFragment {
                     onAfter.onResult(new Result<>(true));
                 },
                 (err)->{
-                    onAfter.onResult(new Result<>(true));
+                    onAfter.onResult(new Result<>(false));
                 }
         );
+        getActivity().invalidateOptionsMenu();
     }
 }

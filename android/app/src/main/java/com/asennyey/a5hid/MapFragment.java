@@ -168,6 +168,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if (event != null) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             LatLng pos = marker.getPosition();
+            intent.setType("vnd.android.cursor.dir/email");
+            intent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { event.user.email });
             intent.putExtra(Intent.EXTRA_TEXT, "Let's start a game of thrones at: " + pos.longitude + "," + pos.latitude );
             intent.setType("text/plain");
             startActivity(intent);
