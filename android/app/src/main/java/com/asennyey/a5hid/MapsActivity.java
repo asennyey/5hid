@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class is the main activity that handles fragment creation and navbar navigation.
+ */
+
 package com.asennyey.a5hid;
 
 import android.os.Bundle;
@@ -56,7 +61,7 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
     }
 
     private void showHelp(){
-        //show();
+        show(HelpFragment.class, "help");
     }
 
     private void showLeaderboard(){
@@ -117,7 +122,7 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
                 showSettings();
                 return true;
             case R.id.help_menu:
-                //show();
+                showHelp();
                 return true;
             case R.id.leaderboard_menu:
                 showLeaderboard();
@@ -157,7 +162,7 @@ public class MapsActivity extends AppCompatActivity implements ApiDialogFragment
     public void onDialogPositiveClick(DialogFragment dialog) {
         if(dialog instanceof CreateEventFragment) {
             EventViewModel model = new ViewModelProvider(this).get(EventViewModel.class);
-            model.getEvents();
+            model.getData();
         }
     }
 

@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class is the underlying implementation of the list of all users that a person can add or
+ *  remove as friends.
+ */
 package com.asennyey.a5hid;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,10 +23,6 @@ import com.asennyey.a5hid.databinding.FragmentUserBinding;
 import java.util.List;
 import java.util.Set;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link PlaceholderItem}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class UserRecyclerViewAdapter extends RecyclerView.Adapter<UserRecyclerViewAdapter.ViewHolder> {
 
     private final List<User> mValues;

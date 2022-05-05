@@ -1,3 +1,9 @@
+/**
+ * @author Aramis Sennyey
+ * This class is a general API to the server API, it allows for both GET and POST requests and
+ *  parses their output with JSON streams into usable data.
+ */
+
 package com.asennyey.a5hid.api;
 
 import android.app.Activity;

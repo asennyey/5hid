@@ -33,12 +33,6 @@ import com.google.android.gms.tasks.CancellationTokenSource;
  * create an instance of this fragment.
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
     // Allows class to cancel the location request if it exits the activity.
     // Typically, you use one cancellation source per lifecycle.
     private final CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -55,31 +49,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MapFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance(String param1, String param2) {
-        MapFragment fragment = new MapFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         locationController = LocationController.getInstance();
         model = new ViewModelProvider(this).get(EventViewModel.class);
-        model.getEvents().observe(this, events -> {
+        model.getData().observe(this, events -> {
             System.out.println(mMap);
             if(mMap != null) {
                 // update UI
@@ -134,7 +110,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         mMap = googleMap;
         if(flag){
             flag = false;
-            for (Event event : model.getEvents().getValue()) {
+            for (Event event : model.getData().getValue()) {
                 System.out.println(event);
                 addMarker(event);
             }
@@ -145,7 +121,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             locationController.getPreciseLocation(cancellationTokenSource, (location)->{
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         location.result,
-                        18
+                        5
                 ));
             }, (err)->{
 
@@ -164,8 +140,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         // Retrieve the data from the marker.
         Event event = (Event) marker.getTag();
+        System.out.println(event);
         // Check if a click count was set, then display the click count.
-        if (event != null) {
+        if (event != null && event.user.email != null) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             LatLng pos = marker.getPosition();
             intent.setType("vnd.android.cursor.dir/email");

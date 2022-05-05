@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class handles the username and password submission in a modal popup.
+ */
+
 package com.asennyey.a5hid;
 
 import android.app.Dialog;
@@ -17,27 +22,18 @@ import com.asennyey.a5hid.api.Callback;
 import com.asennyey.a5hid.api.Result;
 import com.google.android.material.textfield.TextInputLayout;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link LoginFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class LoginFragment extends ApiDialogFragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public LoginFragment() {
         // Required empty public constructor
         super(R.string.login, R.layout.fragment_login, R.string.login_title);
     }
 
+    /**
+     * Submit post request to API to login and get JWT.
+     * @param root
+     * @param onAfter
+     */
     @Override
     public void onPositiveButtonClick(Dialog root, Callback<Boolean> onAfter) {
         com.asennyey.a5hid.api.objects.write.User user = new com.asennyey.a5hid.api.objects.write.User();

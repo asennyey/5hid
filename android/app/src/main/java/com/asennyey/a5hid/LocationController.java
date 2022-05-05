@@ -1,3 +1,10 @@
+/**
+ * @author Aramis Sennyey
+ * This class handles common location based functions.
+ *
+ * TODO: Open modal for requesting permissions.
+ */
+
 package com.asennyey.a5hid;
 
 import static com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY;
@@ -23,10 +30,22 @@ public class LocationController {
     private static LocationController instance;
     private Context context;
     private final FusedLocationProviderClient fusedLocationClient;
+
+    /**
+     * Add the context to the current instance.
+     * @param context
+     */
     public LocationController(Context context){
         this.context = context;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
     }
+
+    /**
+     * Get the precise location of the user.
+     * @param cancelTokenSource token to cancel request if needed,
+     * @param onSuccess callback with latlng
+     * @param onError error callback with exception
+     */
     public void getPreciseLocation(CancellationTokenSource cancelTokenSource, Callback<LatLng> onSuccess, Callback<Exception> onError){
         // Request permission
         if (isLocationEnabled()) {
@@ -59,6 +78,10 @@ public class LocationController {
         }
     }
 
+    /**
+     * Check if the user has granted the permission.
+     * @return
+     */
     public boolean isLocationEnabled(){
         // Request permission
         return ActivityCompat.checkSelfPermission(
@@ -67,10 +90,18 @@ public class LocationController {
         ) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * TODO: populate a modal to show to user to add permission.
+     */
     public void requestLocationPermission(){
 
     }
 
+    /**
+     * Get instance with a specific context (basically a constructor)
+     * @param context
+     * @return singleton
+     */
     public static LocationController getInstance(Context context){
         if(instance == null){
             instance = new LocationController(context);
@@ -78,6 +109,11 @@ public class LocationController {
         return instance;
     }
 
+    /**
+     * Used for non-activity context where the context may be null.
+     * Assumes was initially initialized in above GetInstance
+     * @return
+     */
     public static LocationController getInstance(){
         return getInstance(null);
     }

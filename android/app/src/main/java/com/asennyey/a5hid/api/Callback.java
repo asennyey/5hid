@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class is a generic async response.
+ */
+
 package com.asennyey.a5hid.api;
 
 import java.io.UnsupportedEncodingException;

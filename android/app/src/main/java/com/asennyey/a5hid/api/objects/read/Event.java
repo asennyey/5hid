@@ -1,3 +1,7 @@
+/**
+ * @author Aramis Sennyey
+ * This class is a record of an API Event.
+ */
 package com.asennyey.a5hid.api.objects.read;
 
 import com.google.android.gms.maps.model.LatLng;

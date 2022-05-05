@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class handles the list of users (currently the list of friends), with additional
+ *  potential for select functionality that would exist across fragments.
+ */
 package com.asennyey.a5hid.viewmodels;
 
 import androidx.lifecycle.LiveData;
@@ -9,31 +14,14 @@ import com.asennyey.a5hid.api.objects.read.Event;
 
 import java.util.List;
 
-public class EventViewModel extends ViewModel {
-    private final MutableLiveData<Event> selected = new MutableLiveData<>();
-    private MutableLiveData<List<Event>> events;
-    private ApiController api = ApiController.getInstance();
-
-    public void select(Event item) {
-        selected.setValue(item);
-    }
-
-    public LiveData<Event> getSelected() {
-        return selected;
-    }
-
-    public LiveData<List<Event>> getEvents() {
-        if (events == null) {
-            events = new MutableLiveData<>();
-            loadEvents();
-        }
-        return events;
-    }
-
-    private void loadEvents() {
+public class EventViewModel extends BaseViewModel<Event> {
+    /**
+     * Load the list of events from the API.
+     */
+    protected void loadData() {
         // Do an asynchronous operation to fetch users.
         api.getEvents((page)->{
-            events.setValue(page.result.records);
+            data.setValue(page.result.records);
         }, (err)->{
             System.out.println(err.result);
         });

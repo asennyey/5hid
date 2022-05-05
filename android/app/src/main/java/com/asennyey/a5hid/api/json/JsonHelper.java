@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class is a helper to handle stream reading.
+ */
+
 package com.asennyey.a5hid.api.json;
 
 import android.util.JsonReader;

@@ -1,3 +1,7 @@
+/**
+ * @author Aramis Sennyey
+ * This class is representation of a common API response.
+ */
 package com.asennyey.a5hid.api.json;
 
 import java.util.List;

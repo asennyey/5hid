@@ -1,3 +1,7 @@
+/**
+ * @author Aramis Sennyey
+ * This class is a list of all users that a person can add or remove as friends.
+ */
 package com.asennyey.a5hid;
 
 import android.content.ContentResolver;
@@ -28,11 +32,6 @@ import java.util.Set;
  * A fragment representing a list of Items.
  */
 public class UserFragment extends Fragment {
-
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
     private List<User> users = new ArrayList<>();
     private ApiController api = ApiController.getInstance(null);
     private UserRecyclerViewAdapter adapter;
@@ -42,16 +41,6 @@ public class UserFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public UserFragment() {
-    }
-
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static UserFragment newInstance(int columnCount) {
-        UserFragment fragment = new UserFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -106,11 +95,7 @@ public class UserFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
             adapter = new UserRecyclerViewAdapter(users);
             adapter.setOnClickListener((item)->{
                 getData();

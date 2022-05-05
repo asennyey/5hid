@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class is a record of an API JWT.
+ */
+
 package com.asennyey.a5hid.api.objects.read;
 
 public class Jwt {

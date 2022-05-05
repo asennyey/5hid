@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class handles user creation of an event through a modal, currently input of a description
+ *  with inferred location.
+ */
 package com.asennyey.a5hid;
 
 import android.app.Dialog;
@@ -37,6 +42,11 @@ public class CreateEventFragment extends ApiDialogFragment {
         super(R.string.create_event, R.layout.fragment_create_event, R.string.create_event_title);
     }
 
+    /**
+     * On positive button click handle submitting to the API.
+     * @param root
+     * @param onAfter
+     */
     @Override
     public void onPositiveButtonClick(Dialog root, Callback<Boolean> onAfter) {
         com.asennyey.a5hid.api.objects.write.Event event = new com.asennyey.a5hid.api.objects.write.Event();

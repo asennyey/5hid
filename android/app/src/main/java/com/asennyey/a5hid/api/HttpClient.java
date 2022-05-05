@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class is an underlying class to directly interface with the HTTP requests.
+ */
+
 package com.asennyey.a5hid.api;
 
 import static java.net.HttpURLConnection.*;

@@ -1,3 +1,8 @@
+/**
+ * @author Aramis Sennyey
+ * This class handles leaderboard display, using the RecyclerViewAdapter to display a list of
+ *  users in the leaderboard. Relies on API sorting.
+ */
 package com.asennyey.a5hid;
 
 import android.content.Context;
@@ -21,10 +26,6 @@ import java.util.List;
  * A fragment representing a list of Items.
  */
 public class LeaderboardFragment extends Fragment {
-
-    // TODO: Customize parameter argument names
-    private static final String ARG_LEADERBOARD = "leaderboard";
-    // TODO: Customize parameters
     private List<LeaderboardUser> users = new ArrayList<>();
     private ApiController api = ApiController.getInstance(null);
     private LeaderboardRecyclerViewAdapter adapter;
@@ -36,15 +37,10 @@ public class LeaderboardFragment extends Fragment {
     public LeaderboardFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static LeaderboardFragment newInstance(List<LeaderboardUser> users) {
-        LeaderboardFragment fragment = new LeaderboardFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    /**
+     * Get the list of users on create.
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +54,13 @@ public class LeaderboardFragment extends Fragment {
         });
     }
 
+    /**
+     * Set the list view up.
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

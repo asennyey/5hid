@@ -1,3 +1,9 @@
+/**
+ * @author Aramis Sennyey
+ * This class handles the actual display of values for the leaderboard, no override from the basic
+ *  one.
+ */
+
 package com.asennyey.a5hid;
 
 import androidx.recyclerview.widget.RecyclerView;

@@ -1,3 +1,9 @@
+/**
+ * @author Aramis Sennyey
+ * This class handles a dialog fragment that would make an API request and uses callbacks to achieve
+ *  such behavior.
+ */
+
 package com.asennyey.a5hid;
 
 import android.app.Dialog;

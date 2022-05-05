@@ -1,3 +1,9 @@
+/**
+ * @author Aramis Sennyey
+ * This class handles the log-in log-out flow, allowing users to remove or save their credentials
+ *  to the SharedPreferences on the device.
+ */
+
 package com.asennyey.a5hid.api;
 
 import android.content.Context;
