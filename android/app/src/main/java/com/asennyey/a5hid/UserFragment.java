@@ -46,7 +46,6 @@ public class UserFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getData();
     }
 
     /**
@@ -102,6 +101,8 @@ public class UserFragment extends Fragment {
             });
             recyclerView.setAdapter(adapter);
         }
+
+        getData();
         return view;
     }
 }

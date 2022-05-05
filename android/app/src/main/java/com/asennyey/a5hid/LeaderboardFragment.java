@@ -44,14 +44,6 @@ public class LeaderboardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        api.getLeaderboard((page)->{
-            adapter.notifyItemRangeRemoved(0, users.size());
-            users.clear();
-            users.addAll(page.result.records);
-            adapter.notifyItemRangeInserted(0, page.result.records.size());
-        }, (err)->{
-
-        });
     }
 
     /**
@@ -74,6 +66,14 @@ public class LeaderboardFragment extends Fragment {
             adapter = new LeaderboardRecyclerViewAdapter(users);
             recyclerView.setAdapter(adapter);
         }
+        api.getLeaderboard((page)->{
+            adapter.notifyItemRangeRemoved(0, users.size());
+            users.clear();
+            users.addAll(page.result.records);
+            adapter.notifyItemRangeInserted(0, page.result.records.size());
+        }, (err)->{
+
+        });
         return view;
     }
 }
