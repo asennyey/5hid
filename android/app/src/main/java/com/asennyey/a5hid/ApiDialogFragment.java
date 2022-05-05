@@ -99,7 +99,7 @@ public abstract class ApiDialogFragment extends DialogFragment {
         // Get the layout inflater
         LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-        View view = inflater.inflate(R.layout.fragment_create_event, null);
+        View view = inflater.inflate(this.dialogLayout, null);
         builder.setView(view)
                 .setMessage(this.dialogTitle)
                 .setPositiveButton(this.positiveButtonText, (dialog, id) -> {
